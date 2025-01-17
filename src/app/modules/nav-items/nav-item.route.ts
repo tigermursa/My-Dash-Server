@@ -26,6 +26,6 @@ navItemRoutes.delete('/delete-nav-item/:id', deleteNavItemByIDController);
 navItemRoutes.put('/update-nav-item/:id', updateNavItemByIDController);
 
 // Route to toggle user delete status
-navItemRoutes.patch('toggle-delete/:id', toggleNavItemController);
+navItemRoutes.patch('/toggle-show/:id', toggleNavItemController);
 
 export default navItemRoutes;
