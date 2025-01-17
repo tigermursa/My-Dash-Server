@@ -22,7 +22,7 @@ app.use(express.json());
 // Routes
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
-app.use('/api/v3/user', UserRoutes);
+app.use('/api/v2/user', UserRoutes);
 
 // Root route
 app.get('/', (_req: Request, res: Response) => {
