@@ -16,9 +16,10 @@ export const createNavItem = async (
   }
 };
 
-// Get all nav items
+// Get all nav items sorted by id in ascending order
 export const getAllNavItems = async (): Promise<INavItems[]> => {
-  return await NavItem.find({});
+  const navItems = await NavItem.find({});
+  return navItems.sort((a, b) => Number(a.id) - Number(b.id)); // Convert id to number before sorting
 };
 
 // Get a nav item by ID
