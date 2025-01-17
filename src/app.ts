@@ -5,6 +5,7 @@ import path from 'path';
 
 import { errorHandler } from './app/middleware/ErrorHangler';
 import navItemRoutes from './app/modules/nav-items/nav-item.route';
+import { AuthRoutes } from './app/modules/auth/auth.routes';
 
 const app: Application = express();
 
@@ -19,7 +20,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/nav-items', navItemRoutes);
-
+app.use('/api/v2/user', AuthRoutes);
 // Root route
 app.get('/', (_req: Request, res: Response) => {
   const filePath = path.join(process.cwd(), 'views', 'status.html');

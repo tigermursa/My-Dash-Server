@@ -8,10 +8,20 @@ export const signin: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    // Check if email and password are provided
+    if (!email || !password) {
+      throw new CustomError('Email and password are required', 400);
+    }
+
     // Find user by email
     const validUser = await AuthService.findUserByEmail(email);
     if (!validUser) {
       throw new CustomError('User not found', 404);
+    }
+
+    // Ensure the password field exists in the database
+    if (!validUser.password) {
+      throw new CustomError('User password not found in database', 500);
     }
 
     // Check if the password matches
