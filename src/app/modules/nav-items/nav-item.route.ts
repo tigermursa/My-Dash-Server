@@ -5,6 +5,7 @@ import {
   getNavItemByIDController,
   deleteNavItemByIDController,
   updateNavItemByIDController,
+  toggleNavItemController,
 } from './nav-item.controller';
 
 const navItemRoutes = Router();
@@ -23,5 +24,8 @@ navItemRoutes.delete('/delete-nav-item/:id', deleteNavItemByIDController);
 
 // Update a nav item by ID
 navItemRoutes.put('/update-nav-item/:id', updateNavItemByIDController);
+
+// Route to toggle user delete status
+navItemRoutes.patch('toggle-delete/:id', toggleNavItemController);
 
 export default navItemRoutes;

@@ -4,6 +4,7 @@ import {
   deleteNavItemByID,
   getAllNavItems,
   getNavItemByID,
+  toggleItemShowStatus,
   updateNavItemByID,
 } from './nav-item.service';
 
@@ -126,6 +127,31 @@ export const updateNavItemByIDController = async (
       success: true,
       message: 'Nav item updated successfully',
       data: updatedNavItem,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const toggleNavItemController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const data = await toggleItemShowStatus(id);
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Navitem not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Navitem ${data.isShow ? 'marked as hidden' : 'restored'}`,
     });
   } catch (error) {
     next(error);

@@ -9,6 +9,11 @@ const navItemSchema = new mongoose.Schema<INavItems>({
   href: { type: String, required: true },
   group: { type: String, required: true },
   status: { type: String, required: true, default: 'on' },
+  isShow: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 });
 
 // Compile the schema into a model

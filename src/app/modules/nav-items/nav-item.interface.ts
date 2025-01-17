@@ -5,4 +5,5 @@ export interface INavItems extends Document {
   href: string;
   group: string;
   status: string;
+  isShow: boolean;
 }

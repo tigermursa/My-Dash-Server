@@ -44,3 +44,18 @@ export const updateNavItemByID = async (
     runValidators: true,
   });
 };
+
+//toggle show and hide
+export const toggleItemShowStatus = async (
+  id: string,
+): Promise<INavItems | null> => {
+  // Find the data and toggle the 'isShow' status
+  const data = await NavItem.findOne({ id });
+
+  if (data) {
+    data.isShow = !data.isShow;
+    await data.save(); // Save the updated data
+  }
+
+  return data;
+};
