@@ -8,6 +8,7 @@ const navItemSchema = new mongoose.Schema<INavItems>({
   icon: { type: String, required: true },
   href: { type: String, required: true },
   group: { type: String, required: true },
+  status: { type: String, required: true, default: 'on' },
 });
 
 // Compile the schema into a model

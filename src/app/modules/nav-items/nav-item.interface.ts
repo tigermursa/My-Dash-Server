@@ -4,4 +4,5 @@ export interface INavItems extends Document {
   icon: string;
   href: string;
   group: string;
+  status: string;
 }
