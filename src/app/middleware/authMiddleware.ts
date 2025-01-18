@@ -7,8 +7,7 @@ export const authenticateToken = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const token =
-      req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.access_token;
 
     if (!token) {
       res

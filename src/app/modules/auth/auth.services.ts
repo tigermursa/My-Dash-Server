@@ -21,22 +21,13 @@ export const AuthService = {
 };
 
 // Verify token
-export const verifyToken = (token: string): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(
-      token,
-      process.env.JWT_SECRET as string,
-      (err: VerifyErrors | null, decoded: any) => {
-        if (err) {
-          if (err.name === 'TokenExpiredError') {
-            reject({ error: 'Token expired', status: 401 });
-          } else {
-            reject({ error: 'Token invalid', status: 403 });
-          }
-        } else {
-          resolve(decoded);
-        }
-      },
-    );
+export const verifyToken = (token: string) => {
+  return new Promise<any>((resolve, reject) => {
+    jwt.verify(token, 'mysecretjwtkey', (err, decoded) => {
+      if (err) {
+        return reject(new Error('Invalid or expired token'));
+      }
+      resolve(decoded);
+    });
   });
 };

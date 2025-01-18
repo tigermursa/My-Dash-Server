@@ -30,20 +30,26 @@ export const signin: RequestHandler = async (req, res, next) => {
       throw new CustomError('Wrong credentials', 401);
     }
 
-    // Generate JWT token with expiration
+    // Generate JWT token (HARDCODED EXPIRES IN)
     const token = jwt.sign(
       { id: validUser._id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: process.env.EXPIRES_IN },
+      'mysecretjwtkey', // HARDCODED SECRET (Replace with ENV in production)
+      { expiresIn: '1d' }, // HARDCODED EXPIRATION (1 Day)
     );
+
+    // **Set JWT in cookies (Fixed for Localhost)**
+    res.cookie('access_token', token, {
+      httpOnly: true, // Prevent JavaScript from accessing the cookie
+      secure: false, // Set to false because you're using HTTP (not HTTPS) in development
+      sameSite: 'lax', // Allow cookies to be sent across different origins (needed for local development with different ports)
+      maxAge: 3600000,
+    });
 
     res.status(200).json({
       message: 'User logged in successfully!',
-      token,
       _id: validUser._id,
       username: validUser.username,
       email: validUser.email,
-      userImage: validUser.username,
     });
   } catch (error) {
     next(error);
