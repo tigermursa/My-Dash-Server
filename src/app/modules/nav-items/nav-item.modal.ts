@@ -3,7 +3,7 @@ import { INavItems } from './nav-item.interface';
 
 // Define the nav-items schema
 const navItemSchema = new mongoose.Schema<INavItems>({
-  id: { type: String, required: true, unique: true },
+  id: { type: String, required: true },
   name: { type: String, required: true },
   icon: { type: String, required: true },
   href: { type: String, required: true },
@@ -14,6 +14,7 @@ const navItemSchema = new mongoose.Schema<INavItems>({
     required: false,
     default: true,
   },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Associate with User
 });
 
 // Compile the schema into a model

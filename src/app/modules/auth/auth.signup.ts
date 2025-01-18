@@ -5,6 +5,8 @@ import { AuthService } from './auth.services';
 import { validateUser } from './auth.zodValidation';
 import { CustomError } from '../../Error/CustomError';
 import { IUser } from '../user/user.interface';
+import { NavItem } from '../nav-items/nav-item.modal';
+import { generateDefaultNavItems } from '../../data/defaultNavItems';
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -14,7 +16,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     const validationResult = validateUser(req.body);
     if (!validationResult.success) {
       res.status(400).json({ errors: validationResult.error.errors });
-      return; // Ensure the function returns here
+      return;
     }
 
     // Check if user already exists
@@ -36,18 +38,22 @@ export const signup: RequestHandler = async (req, res, next) => {
     // Save the user
     const newUser = await AuthService.createUser(userData);
 
-    // Generate JWT token (HARDCODED EXPIRES IN)
+    // Generate default nav items for the user
+    const defaultNavItems = generateDefaultNavItems(newUser._id);
+    await NavItem.insertMany(defaultNavItems);
+
+    // Generate JWT token
     const token = jwt.sign(
       { id: newUser._id },
       'mysecretjwtkey', // HARDCODED SECRET (Replace with ENV in production)
-      { expiresIn: '1d' }, // HARDCODED EXPIRATION (1 Day)
+      { expiresIn: '1d' },
     );
 
-    // **Set JWT in cookies (Fixed for Localhost)**
+    // Set JWT in cookies
     res.cookie('access_token', token, {
-      httpOnly: true, // Prevent JavaScript from accessing the cookie
-      secure: false, // Set to false because you're using HTTP (not HTTPS) in development
-      sameSite: 'lax', // Allow cookies to be sent across different origins (needed for local development with different ports)
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
       maxAge: 3600000,
     });
 
@@ -58,7 +64,7 @@ export const signup: RequestHandler = async (req, res, next) => {
       email: newUser.email,
     });
 
-    return; // Ensure the function exits here
+    return;
   } catch (error) {
     next(error);
   }

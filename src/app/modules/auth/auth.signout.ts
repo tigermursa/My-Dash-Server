@@ -9,8 +9,8 @@ export async function signout(
     // Clear the cookie
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Secure in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // Adjust for environment
+      secure: false, // Set to false because you're using HTTP (not HTTPS) in development
+      sameSite: 'lax', // Allow cookies to be sent across different origins (needed for local development with different ports)
     });
 
     // Send response
