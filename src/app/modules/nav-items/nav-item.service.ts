@@ -59,3 +59,15 @@ export const toggleItemShowStatus = async (
 
   return data;
 };
+
+// Get all nav items for a specific user
+export const getNavItemsByUserID = async (
+  userId: string,
+): Promise<INavItems[]> => {
+  try {
+    const navItems = await NavItem.find({ userId });
+    return navItems.sort((a, b) => Number(a.id) - Number(b.id)); // Sort by id if needed
+  } catch (error) {
+    throw new Error('Failed to fetch navigation items for the user');
+  }
+};

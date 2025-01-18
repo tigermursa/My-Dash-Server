@@ -4,6 +4,7 @@ import {
   deleteNavItemByID,
   getAllNavItems,
   getNavItemByID,
+  getNavItemsByUserID,
   toggleItemShowStatus,
   updateNavItemByID,
 } from './nav-item.service';
@@ -152,6 +153,34 @@ export const toggleNavItemController = async (
     res.status(200).json({
       success: true,
       message: `Navitem ${data.isShow ? 'marked as hidden' : 'restored'}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all nav items for a specific user by user ID
+export const getNavItemsByUserIDController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  try {
+    const { userId } = req.params;
+    const navItems = await getNavItemsByUserID(userId);
+
+    if (!navItems || navItems.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No navigation items found for the user',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Navigation items fetched successfully',
+      total: navItems.length,
+      data: navItems,
     });
   } catch (error) {
     next(error);
