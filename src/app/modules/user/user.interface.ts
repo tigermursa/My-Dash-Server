@@ -3,5 +3,5 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  isDeleted: boolean;
+  isDeleted?: boolean;
 }

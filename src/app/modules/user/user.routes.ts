@@ -10,7 +10,7 @@ import { authenticateToken } from '../../middleware/authMiddleware';
 
 const UserRoutes = Router();
 
-UserRoutes.get('/get-user/:id', getUserByIDController);
+UserRoutes.get('/get-user/:id', authenticateToken, getUserByIDController);
 UserRoutes.delete('/delete-user/:id', deleteUserByIDController);
 UserRoutes.put('/update-user/:id', updateUserByIDController);
 UserRoutes.patch('/user/:id/toggle-delete', toggleUserDeleteStatusController);
