@@ -44,19 +44,26 @@ export const toggleNavItemController = async (
   next: NextFunction,
 ): Promise<any> => {
   try {
-    const { id } = req.params;
-    const data = await toggleItemShowStatus(id);
+    const { id } = req.params; // Extract navItemId from the URL
+    const userId = req.user?.id; // Extract userId from the decoded JWT token
 
-    if (!data) {
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const updatedNavItem = await toggleItemShowStatus(userId, id);
+
+    if (!updatedNavItem) {
       return res.status(404).json({
         success: false,
-        message: 'Navitem not found',
+        message: 'Nav item not found',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: `Navitem ${data.isShow ? 'marked as hidden' : 'restored'}`,
+      message: `Nav item ${updatedNavItem.isShow ? 'marked as hidden' : 'restored'}`,
+      data: updatedNavItem,
     });
   } catch (error) {
     next(error);

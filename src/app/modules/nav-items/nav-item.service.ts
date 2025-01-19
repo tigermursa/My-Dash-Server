@@ -31,13 +31,14 @@ export const updateNavItemByID = async (
 
 //Toggle show and hide
 export const toggleItemShowStatus = async (
-  id: string,
+  userId: string,
+  navItemId: string,
 ): Promise<INavItems | null> => {
-  // Find the data and toggle the 'isShow' status
-  const data = await NavItem.findOne({ id });
+  // Find the nav item by userId and navItemId
+  const data = await NavItem.findOne({ userId, id: navItemId });
 
   if (data) {
-    data.isShow = !data.isShow;
+    data.isShow = !data.isShow; // Toggle the 'isShow' status
     await data.save(); // Save the updated data
   }
 
