@@ -15,13 +15,18 @@ export const getNavItemsByUserID = async (
 
 // Update a nav item by ID
 export const updateNavItemByID = async (
-  id: string,
+  userId: string,
+  navItemId: string,
   updateData: Partial<INavItems>,
 ): Promise<INavItems | null> => {
-  return await NavItem.findOneAndUpdate({ id }, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  return await NavItem.findOneAndUpdate(
+    { userId, id: navItemId }, // Match both userId from token and navItemId from URL
+    updateData,
+    {
+      new: true, // Return the updated document
+      runValidators: true, // Run schema validation
+    },
+  );
 };
 
 //Toggle show and hide

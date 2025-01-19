@@ -1,33 +1,27 @@
 import { Router } from 'express';
 import {
-  createNavItemController,
-  getAllNavItemsController,
-  getNavItemByIDController,
-  deleteNavItemByIDController,
   updateNavItemByIDController,
   toggleNavItemController,
   getNavItemsByUserIDController,
 } from './nav-item.controller';
 
+import { authenticateToken } from '../../middleware/authMiddleware';
+
 const navItemRoutes = Router();
 
-// Create a nav item
-navItemRoutes.post('/create-nav-item', createNavItemController);
-
-// Get all nav items
-navItemRoutes.get('/get-all-nav-items', getAllNavItemsController);
-
-// Get a single nav item by ID
-navItemRoutes.get('/get-nav-item/:id', getNavItemByIDController);
-
-// Delete a nav item by ID
-navItemRoutes.delete('/delete-nav-item/:id', deleteNavItemByIDController);
-
 // Update a nav item by ID
-navItemRoutes.put('/update-nav-item/:id', updateNavItemByIDController);
+navItemRoutes.put(
+  '/update-nav-item/:id',
+  authenticateToken,
+  updateNavItemByIDController,
+);
 
 // Route to toggle user delete status
-navItemRoutes.patch('/toggle-show/:id', toggleNavItemController);
+navItemRoutes.patch(
+  '/toggle-show/:id',
+  authenticateToken,
+  toggleNavItemController,
+);
 
 // Get all nav items for a specific user
 navItemRoutes.get(
