@@ -14,7 +14,7 @@ const navItemSchema = new mongoose.Schema<INavItems>({
     required: false,
     default: true,
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Associate with User
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
 // Compile the schema into a model
