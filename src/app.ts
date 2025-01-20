@@ -8,7 +8,7 @@ import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
 import PlanROutes from './app/modules/plan/plan.routes';
-import NotepadRoutes from './app/modules/nortepad/notepad.route';
+import NotepadRoutes from './app/modules/notepad/notepad.route';
 
 const app: Application = express();
 
