@@ -1,39 +1,69 @@
-import { INotepad, NotepadType } from './notepad.interface';
 import NotepadModel from './notepad.model';
+import { INotepad, NotepadType } from './notepad.interface';
 
 class NotepadService {
-  // Create a new note
   async createNote(data: INotepad): Promise<INotepad> {
-    const note = new NotepadModel(data);
-    return await note.save();
+    try {
+      const note = new NotepadModel(data);
+      return await note.save();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Error creating note: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred while creating note');
+    }
   }
 
-  // Get all notes (optional filtering by type)
   async getAllNotes(type?: NotepadType): Promise<INotepad[]> {
-    const filter = type ? { type } : {};
-    return await NotepadModel.find(filter).lean(); // lean() for better performance
+    try {
+      const filter = type ? { type } : {};
+      return await NotepadModel.find(filter).lean();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Error fetching notes: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred while fetching notes');
+    }
   }
 
-  // Get a single note by ID
   async getNoteById(id: string): Promise<INotepad | null> {
-    return await NotepadModel.findById(id).lean();
+    try {
+      return await NotepadModel.findById(id).lean();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Error fetching note: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred while fetching note');
+    }
   }
 
-  // Update a note by ID (atomic operation)
   async updateNote(
     id: string,
     data: Partial<INotepad>,
   ): Promise<INotepad | null> {
-    return await NotepadModel.findOneAndUpdate({ _id: id }, data, {
-      new: true,
-      runValidators: true,
-      lean: true,
-    });
+    try {
+      return await NotepadModel.findByIdAndUpdate(id, data, {
+        new: true,
+        runValidators: true,
+        lean: true,
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Error updating note: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred while updating note');
+    }
   }
 
-  // Delete a note by ID
   async deleteNote(id: string): Promise<INotepad | null> {
-    return await NotepadModel.findByIdAndDelete(id).lean();
+    try {
+      return await NotepadModel.findByIdAndDelete(id).lean();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Error deleting note: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred while deleting note');
+    }
   }
 }
 
