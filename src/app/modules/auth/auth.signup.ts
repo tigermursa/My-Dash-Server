@@ -7,6 +7,7 @@ import { CustomError } from '../../Error/CustomError';
 import { IUser } from '../user/user.interface';
 import { NavItem } from '../nav-items/nav-item.modal';
 import { generateDefaultNavItems } from '../../data/defaultNavItems';
+import NotepadModel from '../notepad/notepad.model';
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -41,6 +42,13 @@ export const signup: RequestHandler = async (req, res, next) => {
     // Generate default nav items for the user
     const defaultNavItems = generateDefaultNavItems(newUser._id);
     await NavItem.insertMany(defaultNavItems);
+
+    // Create default Notepad for user
+    await NotepadModel.create({
+      userId: newUser._id,
+      contentNotePad: 'write your note',
+      contentIdea: 'write your idea',
+    });
 
     // Generate JWT token
     const token = jwt.sign(

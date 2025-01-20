@@ -1,13 +1,22 @@
-import express from 'express';
-import * as NotepadController from './notepad.controller';
+import { Router } from 'express';
+import {
+  getContentNotePadController,
+  getContentIdeaController,
+  updateContentNotePadController,
+  updateContentIdeaController,
+  clearContentNotePadController,
+  clearContentIdeaController,
+} from './notepad.controller';
 
-const router = express.Router();
+const router = Router();
 
-// Routes for notepad CRUD operations
-router.post('/create', NotepadController.createNote); // Create new note
-router.get('/get-all', NotepadController.getAllNotes); // Get all notes (with optional type filter)
-router.get('/get-single/:id', NotepadController.getNoteById); // Get a single note by ID
-router.put('/update/:id', NotepadController.updateNote); // Update note by ID
-router.delete('/delete/:id', NotepadController.deleteNote); // Delete note by ID
+router.get('/notepad/:userId', getContentNotePadController);
+router.get('/idea/:userId', getContentIdeaController);
+
+router.patch('/notepad/:userId', updateContentNotePadController);
+router.patch('/idea/:userId', updateContentIdeaController);
+
+router.patch('/notepad/clear/:userId', clearContentNotePadController);
+router.patch('/idea/clear/:userId', clearContentIdeaController);
 
 export default router;

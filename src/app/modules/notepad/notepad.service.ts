@@ -1,70 +1,73 @@
 import NotepadModel from './notepad.model';
-import { INotepad, NotepadType } from './notepad.interface';
 
-class NotepadService {
-  async createNote(data: INotepad): Promise<INotepad> {
-    try {
-      const note = new NotepadModel(data);
-      return await note.save();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Error creating note: ${error.message}`);
-      }
-      throw new Error('Unknown error occurred while creating note');
-    }
+export const getContentNotePad = async (userId: string) => {
+  try {
+    return await NotepadModel.findOne({ userId })
+      .select('contentNotePad')
+      .lean();
+  } catch (error) {
+    throw new Error('Error fetching contentNotePad');
   }
+};
 
-  async getAllNotes(type?: NotepadType): Promise<INotepad[]> {
-    try {
-      const filter = type ? { type } : {};
-      return await NotepadModel.find(filter).lean();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Error fetching notes: ${error.message}`);
-      }
-      throw new Error('Unknown error occurred while fetching notes');
-    }
+export const getContentIdea = async (userId: string) => {
+  try {
+    return await NotepadModel.findOne({ userId }).select('contentIdea').lean();
+  } catch (error) {
+    throw new Error('Error fetching contentIdea');
   }
+};
 
-  async getNoteById(id: string): Promise<INotepad | null> {
-    try {
-      return await NotepadModel.findById(id).lean();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Error fetching note: ${error.message}`);
-      }
-      throw new Error('Unknown error occurred while fetching note');
-    }
+export const updateContentNotePad = async (
+  userId: string,
+  contentNotePad: string,
+) => {
+  try {
+    return await NotepadModel.findOneAndUpdate(
+      { userId },
+      { contentNotePad },
+      { new: true },
+    );
+  } catch (error) {
+    throw new Error('Error updating contentNotePad');
   }
+};
 
-  async updateNote(
-    id: string,
-    data: Partial<INotepad>,
-  ): Promise<INotepad | null> {
-    try {
-      return await NotepadModel.findByIdAndUpdate(id, data, {
-        new: true,
-        runValidators: true,
-        lean: true,
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Error updating note: ${error.message}`);
-      }
-      throw new Error('Unknown error occurred while updating note');
-    }
+export const updateContentIdea = async (
+  userId: string,
+  contentIdea: string,
+) => {
+  try {
+    return await NotepadModel.findOneAndUpdate(
+      { userId },
+      { contentIdea },
+      { new: true },
+    );
+  } catch (error) {
+    throw new Error('Error updating contentIdea');
   }
+};
 
-  async deleteNote(id: string): Promise<INotepad | null> {
-    try {
-      return await NotepadModel.findByIdAndDelete(id).lean();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Error deleting note: ${error.message}`);
-      }
-      throw new Error('Unknown error occurred while deleting note');
-    }
+export const clearContentNotePad = async (userId: string) => {
+  try {
+    return await NotepadModel.findOneAndUpdate(
+      { userId },
+      { contentNotePad: '' },
+      { new: true },
+    );
+  } catch (error) {
+    throw new Error('Error clearing contentNotePad');
   }
-}
+};
 
-export default new NotepadService();
+export const clearContentIdea = async (userId: string) => {
+  try {
+    return await NotepadModel.findOneAndUpdate(
+      { userId },
+      { contentIdea: '' },
+      { new: true },
+    );
+  } catch (error) {
+    throw new Error('Error clearing contentIdea');
+  }
+};

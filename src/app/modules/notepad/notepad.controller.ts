@@ -1,96 +1,86 @@
 import { Request, Response } from 'express';
-import NotepadService from './notepad.service';
+import {
+  getContentNotePad,
+  getContentIdea,
+  updateContentNotePad,
+  updateContentIdea,
+  clearContentNotePad,
+  clearContentIdea,
+} from './notepad.service';
 
-export const createNote = async (
+export const getContentNotePadController = async (
   req: Request,
   res: Response,
-): Promise<void> => {
+) => {
+  const { userId } = req.params;
   try {
-    const newNote = await NotepadService.createNote(req.body);
-    res.status(201).json(newNote);
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+    const data = await getContentNotePad(userId);
+    res.json(data || { contentNotePad: '' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching contentNotePad' });
   }
 };
 
-export const getAllNotes = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getContentIdeaController = async (req: Request, res: Response) => {
+  const { userId } = req.params;
   try {
-    const notes = await NotepadService.getAllNotes(req.query.type as any);
-    res.status(200).json(notes);
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+    const data = await getContentIdea(userId);
+    res.json(data || { contentIdea: '' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching contentIdea' });
   }
 };
 
-export const getNoteById = async (
+export const updateContentNotePadController = async (
   req: Request,
   res: Response,
-): Promise<void> => {
+) => {
+  const { userId } = req.params;
+  const { contentNotePad } = req.body;
   try {
-    const note = await NotepadService.getNoteById(req.params.id);
-    note
-      ? res.status(200).json(note)
-      : res.status(404).json({ error: 'Note not found' });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+    const updated = await updateContentNotePad(userId, contentNotePad);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating contentNotePad' });
   }
 };
 
-export const updateNote = async (
+export const updateContentIdeaController = async (
   req: Request,
   res: Response,
-): Promise<void> => {
+) => {
+  const { userId } = req.params;
+  const { contentIdea } = req.body;
   try {
-    const updatedNote = await NotepadService.updateNote(
-      req.params.id,
-      req.body,
-    );
-    updatedNote
-      ? res.status(200).json(updatedNote)
-      : res.status(404).json({ error: 'Note not found' });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+    const updated = await updateContentIdea(userId, contentIdea);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating contentIdea' });
   }
 };
 
-export const deleteNote = async (
+export const clearContentNotePadController = async (
   req: Request,
   res: Response,
-): Promise<void> => {
+) => {
+  const { userId } = req.params;
   try {
-    const deletedNote = await NotepadService.deleteNote(req.params.id);
-    deletedNote
-      ? res.status(200).json({ message: 'Note deleted successfully' })
-      : res.status(404).json({ error: 'Note not found' });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+    const cleared = await clearContentNotePad(userId);
+    res.json(cleared);
+  } catch (error) {
+    res.status(500).json({ error: 'Error clearing contentNotePad' });
+  }
+};
+
+export const clearContentIdeaController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { userId } = req.params;
+  try {
+    const cleared = await clearContentIdea(userId);
+    res.json(cleared);
+  } catch (error) {
+    res.status(500).json({ error: 'Error clearing contentIdea' });
   }
 };
