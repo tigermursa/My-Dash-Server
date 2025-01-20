@@ -1,12 +1,14 @@
+export interface ITask {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
 export interface IPlan {
   userId: string;
   title: string;
   type: 'todo' | 'week' | 'month' | 'year';
-  tasks: {
-    id: string;
-    text: string;
-    completed: boolean;
-  }[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  tasks: ITask[];
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }

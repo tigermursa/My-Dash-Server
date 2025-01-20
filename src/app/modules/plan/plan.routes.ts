@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import planController from './plan.controller';
 
-const PlanROutes = Router();
+const planRoutes = Router();
 
-PlanROutes.post('/', planController.createPlan);
-PlanROutes.get('/:userId', planController.getPlans);
-PlanROutes.put('/:planId', planController.updatePlan);
-PlanROutes.delete('/:planId', planController.deletePlan);
+// Routes for plan operations
+planRoutes.post('/', planController.createPlan); // Create new plan
+planRoutes.get('/:userId', planController.getPlans); // Get plans by user
+planRoutes.put('/:planId', planController.updatePlan); // Update plan by ID
+planRoutes.delete('/:planId', planController.deletePlan); // Delete plan by ID
 
-export default PlanROutes;
+export default planRoutes;
