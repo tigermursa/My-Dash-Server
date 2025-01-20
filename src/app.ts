@@ -8,6 +8,7 @@ import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
 import PlanROutes from './app/modules/plan/plan.routes';
+import NotepadRoutes from './app/modules/nortepad/notepad.route';
 
 const app: Application = express();
 
@@ -32,6 +33,7 @@ app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
 app.use('/api/v3/plan', PlanROutes);
+app.use('/api/v4/notepad', NotepadRoutes);
 
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
