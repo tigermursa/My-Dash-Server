@@ -1,79 +1,92 @@
-import { IPlan, ITask } from './plan.interface';
-import PlanModel from './plan.model';
+import TasksModel from './plan.model';
+import { AllTasks } from './plan.interface';
+import mongoose from 'mongoose';
 
-class PlanService {
-  // Create a new plan
-  async createPlan(planData: IPlan): Promise<IPlan> {
-    try {
-      const plan = new PlanModel(planData);
-      return await plan.save(); // Use save for atomic operation
-    } catch (error) {
-      throw new Error('Failed to create plan');
-    }
+// ✅ CREATE TASK - Adds a task to user's tasks list
+export const createTask = async (
+  userID: string,
+  task: AllTasks,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    // Create a new subdocument inside the existing document
+    const newTask = userTasks.tasks.create({
+      ...task,
+      _id: new mongoose.Types.ObjectId(),
+    });
+
+    userTasks.tasks.push(newTask);
+    await userTasks.save();
+    return true;
   }
 
-  // Get all plans by user ID
-  async getPlansByUser(userId: string): Promise<IPlan[]> {
-    try {
-      return await PlanModel.find({ userId }).lean(); // Use lean() for better performance
-    } catch (error) {
-      throw new Error('Failed to fetch plans');
+  return false;
+};
+
+// ✅ TOGGLE TASK IMPORTANT - Toggles task's "important" state
+export const toggleTaskImportant = async (
+  userID: string,
+  taskId: string,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    const task = userTasks.tasks.id(taskId); // Get subdocument
+    if (task) {
+      task.important = !task.important;
+      await userTasks.save();
+      return true;
     }
   }
+  return false;
+};
 
-  // Update a plan by ID
-  async updatePlan(
-    planId: string,
-    updateData: Partial<IPlan>,
-  ): Promise<IPlan | null> {
-    try {
-      return await PlanModel.findByIdAndUpdate(planId, updateData, {
-        new: true,
-        runValidators: true,
-        lean: true, // Improved performance with lean() to skip Mongoose documents
-      });
-    } catch (error) {
-      throw new Error('Failed to update plan');
+// ✅ TOGGLE TASK COMPLETION - Toggles task's "isCompleted" state
+export const toggleTaskIsCompleted = async (
+  userID: string,
+  taskId: string,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    const task = userTasks.tasks.id(taskId);
+    if (task) {
+      task.isCompleted = !task.isCompleted;
+      await userTasks.save();
+      return true;
     }
   }
+  return false;
+};
 
-  // Delete a plan by ID
-  async deletePlan(planId: string): Promise<IPlan | null> {
-    try {
-      return await PlanModel.findByIdAndDelete(planId).lean(); // lean() for performance boost
-    } catch (error) {
-      throw new Error('Failed to delete plan');
-    }
+// ✅ REMOVE TASK - Deletes a task from user's task list
+export const removeTask = async (
+  userID: string,
+  taskId: string,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    userTasks.tasks.pull(taskId); // Mongoose method to remove subdocument
+    await userTasks.save();
+    return true;
   }
+  return false;
+};
 
-  // Add a task to a plan
-  async addTaskToPlan(planId: string, task: ITask): Promise<IPlan | null> {
-    try {
-      return await PlanModel.findByIdAndUpdate(
-        planId,
-        { $push: { tasks: task } },
-        { new: true, runValidators: true, lean: true },
-      );
-    } catch (error) {
-      throw new Error('Failed to add task');
-    }
-  }
+// ✅ GET ALL TASKS - Retrieves all tasks for a user
+export const getTasks = async (
+  userID: string,
+): Promise<AllTasks[] | undefined> => {
+  const userTasks = await TasksModel.findOne({ userID });
 
-  // Mark a task as completed in a plan
-  async markTaskAsCompleted(
-    planId: string,
-    taskId: string,
-  ): Promise<IPlan | null> {
-    try {
-      return await PlanModel.findOneAndUpdate(
-        { _id: planId, 'tasks.id': taskId },
-        { $set: { 'tasks.$.completed': true } },
-        { new: true, lean: true },
-      );
-    } catch (error) {
-      throw new Error('Failed to mark task as completed');
-    }
-  }
-}
+  if (!userTasks) return undefined;
 
-export default new PlanService();
+  return userTasks.tasks.map((task) => ({
+    id: task._id.toString(), // Convert _id to id
+    text: task.text,
+    important: task.important,
+    isCompleted: task.isCompleted,
+  }));
+};

@@ -1,12 +1,18 @@
 import { Router } from 'express';
-import planController from './plan.controller';
+import {
+  createTaskHandler,
+  toggleImportantHandler,
+  toggleIsCompletedHandler,
+  deleteTaskHandler,
+  getTasksHandler,
+} from './plan.controller';
 
-const planRoutes = Router();
+const PlanROutes = Router();
 
-// Routes for plan operations
-planRoutes.post('/', planController.createPlan); // Create new plan
-planRoutes.get('/:userId', planController.getPlans); // Get plans by user
-planRoutes.put('/:planId', planController.updatePlan); // Update plan by ID
-planRoutes.delete('/:planId', planController.deletePlan); // Delete plan by ID
+PlanROutes.post('/create', createTaskHandler);
+PlanROutes.patch('/task/important', toggleImportantHandler);
+PlanROutes.patch('/task/completed', toggleIsCompletedHandler);
+PlanROutes.delete('/delete', deleteTaskHandler);
+PlanROutes.get('/tasks/:userID', getTasksHandler);
 
-export default planRoutes;
+export default PlanROutes;

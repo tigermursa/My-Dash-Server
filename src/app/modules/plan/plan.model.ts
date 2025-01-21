@@ -1,34 +1,37 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
-import { IPlan, ITask } from './plan.interface';
+import mongoose, { Schema, Document } from 'mongoose';
 
-interface IPlanModel extends IPlan, Document {}
+// Define AllTasksDocument (Subdocument Schema)
+export interface AllTasksDocument extends Document {
+  _id: mongoose.Types.ObjectId; // Mongoose automatically assigns this
+  text: string;
+  important: boolean;
+  isCompleted: boolean;
+}
 
-const TaskSchema = new Schema<ITask>({
-  id: { type: String, required: true },
+// Define Main TasksDocument Schema
+export interface TasksDocument extends Document {
+  userID: string;
+  title: 'todo' | 'week' | 'month' | 'year'; // Ensure enum type safety
+  tasks: mongoose.Types.DocumentArray<AllTasksDocument>;
+}
+
+// Define AllTasks Schema (Embedded Subdocument)
+const AllTasksSchema = new Schema<AllTasksDocument>({
   text: { type: String, required: true },
-  completed: { type: Boolean, default: false },
+  important: { type: Boolean, required: true },
+  isCompleted: { type: Boolean, required: true },
 });
 
-const PlanSchema = new Schema<IPlanModel>(
-  {
-    userId: { type: String, required: true, index: true }, // Indexing userId for fast lookups
-    title: { type: String, required: true },
-    type: {
-      type: String,
-      enum: ['todo', 'week', 'month', 'year'],
-      required: true,
-    },
-    tasks: [TaskSchema], // Use the task schema to maintain the task structure
+// Define Main Tasks Schema
+const TasksSchema = new Schema<TasksDocument>({
+  userID: { type: String, required: true },
+  title: {
+    type: String,
+    required: true,
+    enum: ['todo', 'week', 'month', 'year'],
   },
-  { timestamps: true, versionKey: false },
-);
+  tasks: { type: [AllTasksSchema], required: true },
+});
 
-// Ensure there's an index on userId and type for faster queries
-PlanSchema.index({ userId: 1, type: 1 });
-
-const PlanModel: Model<IPlanModel> = mongoose.model<IPlanModel>(
-  'Plan',
-  PlanSchema,
-);
-
-export default PlanModel;
+const TasksModel = mongoose.model<TasksDocument>('Tasks', TasksSchema);
+export default TasksModel;

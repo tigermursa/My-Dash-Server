@@ -1,69 +1,73 @@
 import { Request, Response } from 'express';
-import planService from './plan.service';
+import {
+  createTask,
+  toggleTaskImportant,
+  toggleTaskIsCompleted,
+  removeTask,
+  getTasks,
+} from './plan.service';
 
-class PlanController {
-  // Create a new plan
-  async createPlan(req: Request, res: Response): Promise<void> {
-    try {
-      const plan = await planService.createPlan(req.body);
-      res.status(201).json(plan); // 201 Created
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error creating plan',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
+export const createTaskHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { userID, task } = req.body;
+  const success = await createTask(userID, task);
+  if (success) {
+    res.status(201).send({ message: 'Task created successfully.' });
+  } else {
+    res.status(400).send({ message: 'Failed to create task.' });
   }
+};
 
-  // Get all plans for a user
-  async getPlans(req: Request, res: Response): Promise<void> {
-    try {
-      const { userId } = req.params;
-      const plans = await planService.getPlansByUser(userId);
-      res.status(200).json(plans); // 200 OK
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error fetching plans',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
+export const toggleImportantHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { userID, taskId } = req.body;
+  const success = await toggleTaskImportant(userID, taskId);
+  if (success) {
+    res.status(200).send({ message: 'Task importance toggled successfully.' });
+  } else {
+    res.status(400).send({ message: 'Failed to toggle task importance.' });
   }
+};
 
-  // Update a specific plan by ID
-  async updatePlan(req: Request, res: Response): Promise<void> {
-    try {
-      const { planId } = req.params;
-      const updatedPlan = await planService.updatePlan(planId, req.body);
-      if (updatedPlan) {
-        res.status(200).json(updatedPlan); // 200 OK
-      } else {
-        res.status(404).json({ message: 'Plan not found' }); // 404 Not Found
-      }
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error updating plan',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
+export const toggleIsCompletedHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { userID, taskId } = req.body;
+  const success = await toggleTaskIsCompleted(userID, taskId);
+  if (success) {
+    res.status(200).send({ message: 'Task completion toggled successfully.' });
+  } else {
+    res.status(400).send({ message: 'Failed to toggle task completion.' });
   }
+};
 
-  // Delete a specific plan by ID
-  async deletePlan(req: Request, res: Response): Promise<void> {
-    try {
-      const { planId } = req.params;
-      const result = await planService.deletePlan(planId);
-      if (result) {
-        res.status(200).json({ message: 'Plan deleted successfully' }); // 200 OK
-      } else {
-        res.status(404).json({ message: 'Plan not found' }); // 404 Not Found
-      }
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error deleting plan',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
+export const deleteTaskHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { userID, taskId } = req.body;
+  const success = await removeTask(userID, taskId);
+  if (success) {
+    res.status(200).send({ message: 'Task deleted successfully.' });
+  } else {
+    res.status(400).send({ message: 'Failed to delete task.' });
   }
-}
+};
 
-export default new PlanController();
+export const getTasksHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { userID } = req.params;
+  const tasks = await getTasks(userID);
+  if (tasks) {
+    res.status(200).send(tasks);
+  } else {
+    res.status(404).send({ message: 'Tasks not found.' });
+  }
+};

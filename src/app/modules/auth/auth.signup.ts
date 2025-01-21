@@ -8,6 +8,7 @@ import { IUser } from '../user/user.interface';
 import { NavItem } from '../nav-items/nav-item.modal';
 import { generateDefaultNavItems } from '../../data/defaultNavItems';
 import NotepadModel from '../notepad/notepad.model';
+import TasksModel from '../plan/plan.model';
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -50,6 +51,12 @@ export const signup: RequestHandler = async (req, res, next) => {
       contentIdea: 'write your idea',
     });
 
+    // Create an empty TasksModel document for the new user
+    await TasksModel.create({
+      userID: newUser._id,
+      title: 'todo', // Default title (you can adjust if needed)
+      tasks: [],
+    });
     // Generate JWT token
     const token = jwt.sign(
       { id: newUser._id },
