@@ -1,48 +1,78 @@
 import { Request, Response } from 'express';
 import {
   createTask,
-  toggleTaskImportant,
-  toggleTaskIsCompleted,
+  toggleTaskState,
   removeTask,
   getTasks,
+  NotFoundError,
+  ValidationError,
 } from './plan.service';
+
+// Generic error handler
+const handleError = (res: Response, error: unknown) => {
+  if (error instanceof ValidationError) {
+    return res
+      .status(400)
+      .json({ code: 'VALIDATION_ERROR', message: error.message });
+  }
+  if (error instanceof NotFoundError) {
+    return res.status(404).json({ code: 'NOT_FOUND', message: error.message });
+  }
+  console.error(error);
+  res
+    .status(500)
+    .json({ code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' });
+};
+
+// Request validation middleware could be added here
 
 export const createTaskHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID, task } = req.body;
-  const success = await createTask(userID, task);
-  if (success) {
-    res.status(201).send({ message: 'Task created successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to create task.' });
+  try {
+    const { userID } = req.params;
+    const taskData = req.body;
+
+    const createdTask = await createTask(userID, taskData);
+    res.status(201).json({
+      code: 'TASK_CREATED',
+      data: createdTask,
+    });
+  } catch (error) {
+    handleError(res, error);
   }
 };
 
-export const toggleImportantHandler = async (
+export const toggleStateHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID, taskId } = req.body;
-  const success = await toggleTaskImportant(userID, taskId);
-  if (success) {
-    res.status(200).send({ message: 'Task importance toggled successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to toggle task importance.' });
-  }
-};
+  try {
+    const { userID, taskId } = req.params;
+    const { field } = req.query;
 
-export const toggleIsCompletedHandler = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  const { userID, taskId } = req.body;
-  const success = await toggleTaskIsCompleted(userID, taskId);
-  if (success) {
-    res.status(200).send({ message: 'Task completion toggled successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to toggle task completion.' });
+    // Validate field parameter
+    if (!['important', 'isCompleted'].includes(field as string)) {
+      res.status(400).json({
+        code: 'INVALID_FIELD',
+        message: 'Field must be either "important" or "isCompleted"',
+      });
+      return; // Exit the function after sending response
+    }
+
+    const updatedTask = await toggleTaskState(
+      userID,
+      taskId,
+      field as 'important' | 'isCompleted',
+    );
+
+    res.status(200).json({
+      code: 'TASK_UPDATED',
+      data: updatedTask,
+    });
+  } catch (error) {
+    handleError(res, error);
   }
 };
 
@@ -50,12 +80,13 @@ export const deleteTaskHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID, taskId } = req.body;
-  const success = await removeTask(userID, taskId);
-  if (success) {
-    res.status(200).send({ message: 'Task deleted successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to delete task.' });
+  try {
+    const { userID, taskId } = req.params;
+
+    await removeTask(userID, taskId);
+    res.status(204).end();
+  } catch (error) {
+    handleError(res, error);
   }
 };
 
@@ -63,11 +94,14 @@ export const getTasksHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID } = req.params;
-  const tasks = await getTasks(userID);
-  if (tasks) {
-    res.status(200).send(tasks);
-  } else {
-    res.status(404).send({ message: 'Tasks not found.' });
+  try {
+    const { userID } = req.params;
+    const tasks = await getTasks(userID);
+    res.status(200).json({
+      code: 'TASKS_FOUND',
+      data: tasks,
+    });
+  } catch (error) {
+    handleError(res, error);
   }
 };

@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import {
   createTaskHandler,
-  toggleImportantHandler,
-  toggleIsCompletedHandler,
+  toggleStateHandler,
   deleteTaskHandler,
   getTasksHandler,
 } from './plan.controller';
@@ -10,8 +9,8 @@ import {
 const PlanROutes = Router();
 
 PlanROutes.post('/create', createTaskHandler);
-PlanROutes.patch('/task/important', toggleImportantHandler);
-PlanROutes.patch('/task/completed', toggleIsCompletedHandler);
+PlanROutes.patch('/task/important', toggleStateHandler);
+PlanROutes.patch('/task/completed', toggleStateHandler);
 PlanROutes.delete('/delete', deleteTaskHandler);
 PlanROutes.get('/tasks/:userID', getTasksHandler);
 
