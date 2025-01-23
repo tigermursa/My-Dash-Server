@@ -3,7 +3,7 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { errorHandler } from './app/middleware/ErrorHangler';
+import errorHandler from './app/middleware/errorHandler';
 import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
