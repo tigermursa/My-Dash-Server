@@ -1,127 +1,90 @@
-import mongoose from 'mongoose';
 import TasksModel from './plan.model';
-import { AllTasks, Tasks } from './plan.interface';
+import { AllTasks } from './plan.interface';
+import mongoose from 'mongoose';
 
-// Custom error classes for better error handling
-export class NotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NotFoundError';
-  }
-}
-
-export class ValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ValidationError';
-  }
-}
-
-// Utility function to validate ObjectId
-const isValidObjectId = (id: string): boolean =>
-  mongoose.Types.ObjectId.isValid(id);
-
-// Optimized CRUD Operations
-
+// ✅ CREATE TASK - Adds a task to user's tasks list
 export const createTask = async (
   userID: string,
-  taskData: Omit<AllTasks, 'id'>,
-): Promise<AllTasks> => {
-  const newTaskId = new mongoose.Types.ObjectId();
+  task: AllTasks,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
 
-  const updatedDocument = await TasksModel.findOneAndUpdate(
-    { userID },
-    {
-      $push: {
-        tasks: {
-          _id: newTaskId,
-          ...taskData,
-        },
-      },
-    },
-    {
-      new: true,
-      upsert: true,
-      projection: { tasks: { $elemMatch: { _id: newTaskId } } },
-    },
-  ).lean();
+  if (userTasks) {
+    // Create a new subdocument inside the existing document
+    const newTask = userTasks.tasks.create({
+      ...task,
+      _id: new mongoose.Types.ObjectId(),
+    });
 
-  const createdTask = updatedDocument?.tasks[0];
-  if (!createdTask) throw new Error('Task creation failed');
+    userTasks.tasks.push(newTask);
+    await userTasks.save();
+    return true;
+  }
 
-  return {
-    id: createdTask._id.toString(),
-    text: createdTask.text,
-    important: createdTask.important,
-    isCompleted: createdTask.isCompleted,
-  };
+  return false;
 };
 
-export const toggleTaskState = async (
+// ✅ TOGGLE TASK IMPORTANT - Toggles task's "important" state
+export const toggleTaskImportant = async (
   userID: string,
   taskId: string,
-  field: 'important' | 'isCompleted',
-): Promise<AllTasks> => {
-  if (!isValidObjectId(taskId)) {
-    throw new ValidationError('Invalid task ID format');
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    const task = userTasks.tasks.id(taskId); // Get subdocument
+    if (task) {
+      task.important = !task.important;
+      await userTasks.save();
+      return true;
+    }
   }
-
-  const updatedDocument = await TasksModel.findOneAndUpdate(
-    {
-      userID,
-      'tasks._id': taskId,
-    },
-    { $bit: { [`tasks.$.${field}`]: { xor: 1 } } },
-    {
-      new: true,
-      projection: { tasks: { $elemMatch: { _id: taskId } } },
-    },
-  ).lean();
-
-  if (!updatedDocument) {
-    throw new NotFoundError('User or task not found');
-  }
-
-  const updatedTask = updatedDocument.tasks[0];
-  return {
-    id: updatedTask._id.toString(),
-    text: updatedTask.text,
-    important: updatedTask.important,
-    isCompleted: updatedTask.isCompleted,
-  };
+  return false;
 };
 
+// ✅ TOGGLE TASK COMPLETION - Toggles task's "isCompleted" state
+export const toggleTaskIsCompleted = async (
+  userID: string,
+  taskId: string,
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
+
+  if (userTasks) {
+    const task = userTasks.tasks.id(taskId);
+    if (task) {
+      task.isCompleted = !task.isCompleted;
+      await userTasks.save();
+      return true;
+    }
+  }
+  return false;
+};
+
+// ✅ REMOVE TASK - Deletes a task from user's task list
 export const removeTask = async (
   userID: string,
   taskId: string,
-): Promise<void> => {
-  if (!isValidObjectId(taskId)) {
-    throw new ValidationError('Invalid task ID format');
-  }
+): Promise<boolean> => {
+  const userTasks = await TasksModel.findOne({ userID });
 
-  const result = await TasksModel.findOneAndUpdate(
-    { userID },
-    { $pull: { tasks: { _id: taskId } } },
-    { new: true },
-  ).lean();
-
-  if (!result) {
-    throw new NotFoundError('User not found');
+  if (userTasks) {
+    userTasks.tasks.pull(taskId); // Mongoose method to remove subdocument
+    await userTasks.save();
+    return true;
   }
-
-  const taskExists = result.tasks.some((t) => t._id.toString() === taskId);
-  if (taskExists) {
-    throw new Error('Failed to delete task');
-  }
+  return false;
 };
 
-export const getTasks = async (userID: string): Promise<AllTasks[]> => {
-  const result = await TasksModel.findOne({ userID }, { tasks: 1 }).lean();
+// ✅ GET ALL TASKS - Retrieves all tasks for a user
+export const getTasks = async (
+  userID: string,
+): Promise<AllTasks[] | undefined> => {
+  const userTasks = await TasksModel.findOne({ userID });
 
-  if (!result) return [];
+  if (!userTasks) return undefined;
 
-  return result.tasks.map((task) => ({
-    id: task._id.toString(),
+  return userTasks.tasks.map((task) => ({
+    id: task._id.toString(), // Convert _id to id
     text: task.text,
     important: task.important,
     isCompleted: task.isCompleted,

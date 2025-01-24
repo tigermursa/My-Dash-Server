@@ -52,11 +52,28 @@ export const signup: RequestHandler = async (req, res, next) => {
     });
 
     // Create an empty TasksModel document for the new user
-    await TasksModel.create({
-      userID: newUser._id,
-      title: 'todo', // Default title (you can adjust if needed)
-      tasks: [],
-    });
+    await TasksModel.create([
+      {
+        userID: newUser._id,
+        title: 'todo',
+        tasks: [],
+      },
+      {
+        userID: newUser._id,
+        title: 'week',
+        tasks: [],
+      },
+      {
+        userID: newUser._id,
+        title: 'month',
+        tasks: [],
+      },
+      {
+        userID: newUser._id,
+        title: 'year',
+        tasks: [],
+      },
+    ]);
     // Generate JWT token
     const token = jwt.sign(
       { id: newUser._id },
