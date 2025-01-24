@@ -196,15 +196,60 @@ export const toggleTaskIsCompleted = async (
 export const removeTask = async (
   userID: string,
   taskId: string,
-): Promise<boolean> => {
-  const userTasks = await TasksModel.findOne({ userID });
+): Promise<ServiceResponse<{ deletedTaskId: string }>> => {
+  try {
+    const userTasks = await TasksModel.findOne({ userID });
 
-  if (userTasks) {
-    userTasks.tasks.pull(taskId); // Mongoose method to remove subdocument
+    if (!userTasks) {
+      return {
+        success: false,
+        error: 'User not found',
+        message: 'No tasks document exists for this user',
+      };
+    }
+
+    const task = userTasks.tasks.id(taskId);
+    if (!task) {
+      return {
+        success: false,
+        error: 'Task not found',
+        message: 'The specified task does not exist',
+      };
+    }
+
+    userTasks.tasks.pull(taskId);
     await userTasks.save();
-    return true;
+
+    return {
+      success: true,
+      data: { deletedTaskId: taskId },
+      message: 'Task deleted successfully',
+    };
+  } catch (error) {
+    console.error('Error deleting task:', error);
+
+    if (error instanceof mongoose.Error.CastError) {
+      return {
+        success: false,
+        error: 'Invalid task ID format',
+        message: 'The provided task ID is malformed',
+      };
+    }
+
+    if (error instanceof mongoose.Error) {
+      return {
+        success: false,
+        error: 'Database operation failed',
+        message: 'Error removing task',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Internal server error',
+      message: 'Unexpected error occurred',
+    };
   }
-  return false;
 };
 
 // ✅ GET ALL TASKS - Retrieves all tasks for a user

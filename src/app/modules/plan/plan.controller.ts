@@ -138,16 +138,51 @@ export const toggleIsCompletedHandler = async (
   }
 };
 
+//!delete
 export const deleteTaskHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID, taskId } = req.body;
-  const success = await removeTask(userID, taskId);
-  if (success) {
-    res.status(200).send({ message: 'Task deleted successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to delete task.' });
+  try {
+    const { userID, taskId } = req.body;
+
+    if (!userID || !taskId) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing parameters',
+        message: 'Both userID and taskId are required',
+      });
+      return;
+    }
+
+    const result = await removeTask(userID, taskId);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        message: result.message,
+      });
+    } else {
+      const statusCode =
+        result.error === 'User not found'
+          ? 404
+          : result.error === 'Invalid task ID format'
+            ? 400
+            : 500;
+      res.status(statusCode).json({
+        success: false,
+        error: result.error,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Unexpected error in deleteTaskHandler:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'An unexpected error occurred',
+    });
   }
 };
 
