@@ -2,9 +2,17 @@ import TasksModel, { AllTasksDocument } from './plan.model';
 import { AllTasks } from './plan.interface';
 import mongoose from 'mongoose';
 
+export type TaskResponse = {
+  id: string;
+  text: string;
+  title: 'todo' | 'week' | 'month' | 'year';
+  important: boolean;
+  isCompleted: boolean;
+};
+
 type ServiceResponse<T> =
-  | { success: true; data: T; message?: string } // Optional message for success
-  | { success: false; error: string; message?: string }; // Optional message for errors
+  | { success: true; data: T; message?: string }
+  | { success: false; error: string; message?: string };
 
 // ✅ CREATE TASK - Adds a task to user's tasks list
 export const createTask = async (
@@ -52,36 +60,136 @@ export const createTask = async (
 export const toggleTaskImportant = async (
   userID: string,
   taskId: string,
-): Promise<boolean> => {
-  const userTasks = await TasksModel.findOne({ userID });
+): Promise<ServiceResponse<TaskResponse>> => {
+  try {
+    const userTasks = await TasksModel.findOne({ userID });
 
-  if (userTasks) {
-    const task = userTasks.tasks.id(taskId); // Get subdocument
-    if (task) {
-      task.important = !task.important;
-      await userTasks.save();
-      return true;
+    if (!userTasks) {
+      return {
+        success: false,
+        error: 'User not found',
+        message: 'No tasks document exists for this user',
+      };
     }
+
+    const task = userTasks.tasks.id(taskId);
+    if (!task) {
+      return {
+        success: false,
+        error: 'Task not found',
+        message: 'The specified task does not exist',
+      };
+    }
+
+    task.important = !task.important;
+    await userTasks.save();
+
+    const responseData: TaskResponse = {
+      id: task._id.toString(),
+      text: task.text,
+      title: task.title,
+      important: task.important,
+      isCompleted: task.isCompleted,
+    };
+
+    return {
+      success: true,
+      data: responseData,
+      message: 'Task importance updated successfully',
+    };
+  } catch (error) {
+    console.error('Error toggling task importance:', error);
+
+    if (error instanceof mongoose.Error.CastError) {
+      return {
+        success: false,
+        error: 'Invalid task ID format',
+        message: 'The provided task ID is malformed',
+      };
+    }
+
+    if (error instanceof mongoose.Error) {
+      return {
+        success: false,
+        error: 'Database operation failed',
+        message: 'Error saving task changes',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Internal server error',
+      message: 'Unexpected error occurred',
+    };
   }
-  return false;
 };
 
 // ✅ TOGGLE TASK COMPLETION - Toggles task's "isCompleted" state
 export const toggleTaskIsCompleted = async (
   userID: string,
   taskId: string,
-): Promise<boolean> => {
-  const userTasks = await TasksModel.findOne({ userID });
+): Promise<ServiceResponse<TaskResponse>> => {
+  try {
+    const userTasks = await TasksModel.findOne({ userID });
 
-  if (userTasks) {
-    const task = userTasks.tasks.id(taskId);
-    if (task) {
-      task.isCompleted = !task.isCompleted;
-      await userTasks.save();
-      return true;
+    if (!userTasks) {
+      return {
+        success: false,
+        error: 'User not found',
+        message: 'No tasks document exists for this user',
+      };
     }
+
+    const task = userTasks.tasks.id(taskId);
+    if (!task) {
+      return {
+        success: false,
+        error: 'Task not found',
+        message: 'The specified task does not exist',
+      };
+    }
+
+    task.isCompleted = !task.isCompleted;
+    await userTasks.save();
+
+    const responseData: TaskResponse = {
+      id: task._id.toString(),
+      text: task.text,
+      title: task.title,
+      important: task.important,
+      isCompleted: task.isCompleted,
+    };
+
+    return {
+      success: true,
+      data: responseData,
+      message: 'Task completion status updated successfully',
+    };
+  } catch (error) {
+    console.error('Error toggling task completion:', error);
+
+    if (error instanceof mongoose.Error.CastError) {
+      return {
+        success: false,
+        error: 'Invalid task ID format',
+        message: 'The provided task ID is malformed',
+      };
+    }
+
+    if (error instanceof mongoose.Error) {
+      return {
+        success: false,
+        error: 'Database operation failed',
+        message: 'Error saving task changes',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Internal server error',
+      message: 'Unexpected error occurred',
+    };
   }
-  return false;
 };
 
 // ✅ REMOVE TASK - Deletes a task from user's task list
