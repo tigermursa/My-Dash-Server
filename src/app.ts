@@ -7,8 +7,9 @@ import cookieParser from 'cookie-parser';
 import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
-import PlanROutes from './app/modules/plan/plan.routes';
+
 import NotepadRoutes from './app/modules/notepad/notepad.route';
+import PlanR0utes from './app/modules/plan/plan.routes';
 
 const app: Application = express();
 
@@ -32,7 +33,7 @@ app.use(express.json());
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
-app.use('/api/v3/plan', PlanROutes);
+app.use('/api/v3/plan', PlanR0utes);
 app.use('/api/v4/notepad', NotepadRoutes);
 
 // Root route for serving status page

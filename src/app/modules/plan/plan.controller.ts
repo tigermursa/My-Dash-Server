@@ -1,225 +1,103 @@
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import {
   createTask,
-  toggleTaskImportant,
-  toggleTaskIsCompleted,
+  toggleTaskField,
   removeTask,
   getTasks,
 } from './plan.service';
+import { ServiceResponse } from '../../types/plan';
+import { determineStatusCode } from '../../Error/handleError';
 
-export const createTaskHandler = async (
-  req: Request,
+// Generic response handler
+const handleControllerResponse = (
   res: Response,
-): Promise<void> => {
-  try {
-    const { userID, task } = req.body;
-
-    if (!userID || !task) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Missing userID or task data' });
-      return;
-    }
-
-    const result = await createTask(userID, task);
-
-    if (result.success) {
-      res.status(201).json({
-        success: true,
-        data: result.data,
-        message: 'Task created successfully',
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        error: result.error,
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error in createTaskHandler:', error);
-    res.status(500).json({
+  result: ServiceResponse<any>,
+) => {
+  if (result.success) {
+    res.status(result.message ? 200 : 201).json(result);
+  } else {
+    const statusCode = determineStatusCode(result.error);
+    res.status(statusCode).json({
       success: false,
-      error: 'An unexpected error occurred while processing your request',
+      error: result.error,
+      message: result.message,
     });
   }
 };
 
-export const toggleImportantHandler = async (
+// Request validation middleware
+const validateRequestParams = (
   req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { userID, taskId } = req.body;
-
-    if (!userID || !taskId) {
-      res.status(400).json({
-        success: false,
-        error: 'Missing parameters',
-        message: 'Both userID and taskId are required',
-      });
-      return;
-    }
-
-    const result = await toggleTaskImportant(userID, taskId);
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        data: result.data,
-        message: result.message,
-      });
-    } else {
-      const statusCode =
-        result.error === 'User not found'
-          ? 404
-          : result.error === 'Invalid task ID format'
-            ? 400
-            : 500;
-      res.status(statusCode).json({
-        success: false,
-        error: result.error,
-        message: result.message,
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error in toggleImportantHandler:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      message: 'An unexpected error occurred',
-    });
+  params: string[],
+): string | null => {
+  for (const param of params) {
+    if (!req.body[param]) return `Missing required parameter: ${param}`;
   }
+  return null;
 };
 
-export const toggleIsCompletedHandler = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { userID, taskId } = req.body;
-
-    if (!userID || !taskId) {
-      res.status(400).json({
-        success: false,
-        error: 'Missing parameters',
-        message: 'Both userID and taskId are required',
-      });
-      return;
-    }
-
-    const result = await toggleTaskIsCompleted(userID, taskId);
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        data: result.data,
-        message: result.message,
-      });
-    } else {
-      const statusCode =
-        result.error === 'User not found'
-          ? 404
-          : result.error === 'Invalid task ID format'
-            ? 400
-            : 500;
-      res.status(statusCode).json({
-        success: false,
-        error: result.error,
-        message: result.message,
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error in toggleIsCompletedHandler:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      message: 'An unexpected error occurred',
-    });
+// Create Task Handler
+export const createTaskHandler: RequestHandler = async (req, res) => {
+  const paramError = validateRequestParams(req, ['userID', 'task']);
+  if (paramError) {
+    res.status(400).json({ success: false, error: paramError });
+    return;
   }
+
+  const result = await createTask(req.body.userID, req.body.task);
+  result.message = 'Task created successfully';
+  handleControllerResponse(res, result);
 };
 
-//!delete
-export const deleteTaskHandler = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { userID, taskId } = req.body;
-
-    if (!userID || !taskId) {
-      res.status(400).json({
-        success: false,
-        error: 'Missing parameters',
-        message: 'Both userID and taskId are required',
-      });
+// Toggle Field Handler Factory
+export const toggleTaskFieldHandler = (field: string): RequestHandler => {
+  return async (req, res) => {
+    const paramError = validateRequestParams(req, ['userID', 'taskId']);
+    if (paramError) {
+      res.status(400).json({ success: false, error: paramError });
       return;
     }
 
-    const result = await removeTask(userID, taskId);
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        data: result.data,
-        message: result.message,
-      });
-    } else {
-      const statusCode =
-        result.error === 'User not found'
-          ? 404
-          : result.error === 'Invalid task ID format'
-            ? 400
-            : 500;
-      res.status(statusCode).json({
-        success: false,
-        error: result.error,
-        message: result.message,
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error in deleteTaskHandler:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      message: 'An unexpected error occurred',
-    });
-  }
+    const result = await toggleTaskField(
+      req.body.userID,
+      req.body.taskId,
+      field as any,
+    );
+    result.message = `Task ${field} updated successfully`;
+    handleControllerResponse(res, result);
+  };
 };
 
-export const getTasksHandler = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { userID } = req.params;
-
-    if (!userID) {
-      res.status(400).json({
-        success: false,
-        error: 'UserID is required in request parameters',
-      });
-      return;
-    }
-
-    const result = await getTasks(userID);
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        data: result.data,
-        message: result.message,
-      });
-    } else {
-      res.status(result.error?.includes('not found') ? 404 : 500).json({
-        success: false,
-        error: result.error,
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error in getTasksHandler:', error);
-    res.status(500).json({
-      success: false,
-      error: 'An unexpected error occurred while processing your request',
-    });
+// Delete Task Handler
+export const deleteTaskHandler: RequestHandler = async (req, res) => {
+  const paramError = validateRequestParams(req, ['userID', 'taskId']);
+  if (paramError) {
+    res.status(400).json({ success: false, error: paramError });
+    return;
   }
+
+  const result = await removeTask(req.body.userID, req.body.taskId);
+  result.message = 'Task deleted successfully';
+  handleControllerResponse(res, result);
+};
+
+// Get Tasks Handler
+export const getTasksHandler: RequestHandler = async (req, res) => {
+  const { userID } = req.params;
+  if (!userID) {
+    res.status(400).json({ success: false, error: 'Missing userID' });
+    return;
+  }
+
+  const result = await getTasks(userID);
+
+  if (result.success) {
+    result.message = result.data.length
+      ? 'Tasks retrieved successfully'
+      : 'No tasks found for user';
+  } else {
+    result.message = result.message || 'Failed to retrieve tasks';
+  }
+
+  handleControllerResponse(res, result);
 };

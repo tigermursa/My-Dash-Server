@@ -1,18 +1,18 @@
-import { Router } from 'express';
+// routes/plan.routes.ts
+import express from 'express';
 import {
   createTaskHandler,
-  toggleImportantHandler,
-  toggleIsCompletedHandler,
+  toggleTaskFieldHandler,
   deleteTaskHandler,
   getTasksHandler,
 } from './plan.controller';
 
-const PlanROutes = Router();
+const PlanR0utes = express.Router();
 
-PlanROutes.post('/create', createTaskHandler); //done
-PlanROutes.patch('/task/important', toggleImportantHandler);
-PlanROutes.patch('/task/completed', toggleIsCompletedHandler);
-PlanROutes.delete('/delete', deleteTaskHandler);
-PlanROutes.get('/tasks/:userID', getTasksHandler); //done
+PlanR0utes.post('/create', createTaskHandler);
+PlanR0utes.patch('/tasks/important', toggleTaskFieldHandler('important'));
+PlanR0utes.patch('/tasks/completed', toggleTaskFieldHandler('isCompleted'));
+PlanR0utes.delete('/tasks/delete', deleteTaskHandler);
+PlanR0utes.get('/tasks/:userID', getTasksHandler);
 
-export default PlanROutes;
+export default PlanR0utes;
