@@ -1,5 +1,6 @@
 export interface AllTasks {
   id: string;
+  title: string;
   text: string;
   important: boolean;
   isCompleted: boolean;
@@ -7,6 +8,5 @@ export interface AllTasks {
 
 export interface Tasks {
   userID: string;
-  title: string; // "todo", "week", "month", "year"
   tasks: AllTasks[];
 }

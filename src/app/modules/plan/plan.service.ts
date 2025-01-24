@@ -1,16 +1,23 @@
-import TasksModel from './plan.model';
+import TasksModel, { AllTasksDocument } from './plan.model';
 import { AllTasks } from './plan.interface';
 import mongoose from 'mongoose';
+
+type ServiceResponse<T> =
+  | { success: true; data: T; message?: string } // Optional message for success
+  | { success: false; error: string; message?: string }; // Optional message for errors
 
 // ✅ CREATE TASK - Adds a task to user's tasks list
 export const createTask = async (
   userID: string,
-  task: AllTasks,
-): Promise<boolean> => {
-  const userTasks = await TasksModel.findOne({ userID });
+  task: Omit<AllTasksDocument, '_id'>,
+): Promise<ServiceResponse<AllTasksDocument>> => {
+  try {
+    const userTasks = await TasksModel.findOneAndUpdate(
+      { userID },
+      { $setOnInsert: { userID, tasks: [] } },
+      { new: true, upsert: true },
+    );
 
-  if (userTasks) {
-    // Create a new subdocument inside the existing document
     const newTask = userTasks.tasks.create({
       ...task,
       _id: new mongoose.Types.ObjectId(),
@@ -18,10 +25,27 @@ export const createTask = async (
 
     userTasks.tasks.push(newTask);
     await userTasks.save();
-    return true;
-  }
 
-  return false;
+    return { success: true, data: newTask };
+  } catch (error) {
+    console.error('Error creating task:', error);
+
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errorMessages = Object.values(error.errors).map(
+        (err) => err.message,
+      );
+      return {
+        success: false,
+        error: `Validation error: ${errorMessages.join(', ')}`,
+      };
+    }
+
+    if (error instanceof mongoose.Error) {
+      return { success: false, error: 'Database error occurred' };
+    }
+
+    return { success: false, error: 'Internal server error' };
+  }
 };
 
 // ✅ TOGGLE TASK IMPORTANT - Toggles task's "important" state
@@ -78,15 +102,46 @@ export const removeTask = async (
 // ✅ GET ALL TASKS - Retrieves all tasks for a user
 export const getTasks = async (
   userID: string,
-): Promise<AllTasks[] | undefined> => {
-  const userTasks = await TasksModel.findOne({ userID });
+): Promise<ServiceResponse<AllTasks[]>> => {
+  try {
+    const userTasks = await TasksModel.findOne({ userID });
 
-  if (!userTasks) return undefined;
+    if (!userTasks) {
+      return {
+        success: false,
+        error: 'User not found or no tasks exist for this user',
+      };
+    }
 
-  return userTasks.tasks.map((task) => ({
-    id: task._id.toString(), // Convert _id to id
-    text: task.text,
-    important: task.important,
-    isCompleted: task.isCompleted,
-  }));
+    const tasks = userTasks.tasks.map((task) => ({
+      id: task._id.toString(),
+      text: task.text,
+      title: task.title,
+      important: task.important,
+      isCompleted: task.isCompleted,
+    }));
+
+    return {
+      success: true,
+      data: tasks,
+      message:
+        tasks.length === 0
+          ? 'User exists but no tasks found'
+          : 'Tasks retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+
+    if (error instanceof mongoose.Error) {
+      return {
+        success: false,
+        error: 'Database error occurred while fetching tasks',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Unexpected error occurred while fetching tasks',
+    };
+  }
 };

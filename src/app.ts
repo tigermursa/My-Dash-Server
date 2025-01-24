@@ -3,7 +3,7 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import errorHandler from './app/middleware/errorHandler';
+// import errorHandler from './app/middleware/errorHandler';
 import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
@@ -51,6 +51,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 // Error Handler (ensure it's last in the middleware stack)
-app.use(errorHandler);
+// app.use(errorHandler);
 
 export default app;

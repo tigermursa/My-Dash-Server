@@ -11,12 +11,36 @@ export const createTaskHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID, task } = req.body;
-  const success = await createTask(userID, task);
-  if (success) {
-    res.status(201).send({ message: 'Task created successfully.' });
-  } else {
-    res.status(400).send({ message: 'Failed to create task.' });
+  try {
+    const { userID, task } = req.body;
+
+    if (!userID || !task) {
+      res
+        .status(400)
+        .json({ success: false, error: 'Missing userID or task data' });
+      return;
+    }
+
+    const result = await createTask(userID, task);
+
+    if (result.success) {
+      res.status(201).json({
+        success: true,
+        data: result.data,
+        message: 'Task created successfully',
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error('Unexpected error in createTaskHandler:', error);
+    res.status(500).json({
+      success: false,
+      error: 'An unexpected error occurred while processing your request',
+    });
   }
 };
 
@@ -63,11 +87,36 @@ export const getTasksHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { userID } = req.params;
-  const tasks = await getTasks(userID);
-  if (tasks) {
-    res.status(200).send(tasks);
-  } else {
-    res.status(404).send({ message: 'Tasks not found.' });
+  try {
+    const { userID } = req.params;
+
+    if (!userID) {
+      res.status(400).json({
+        success: false,
+        error: 'UserID is required in request parameters',
+      });
+      return;
+    }
+
+    const result = await getTasks(userID);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        message: result.message,
+      });
+    } else {
+      res.status(result.error?.includes('not found') ? 404 : 500).json({
+        success: false,
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error('Unexpected error in getTasksHandler:', error);
+    res.status(500).json({
+      success: false,
+      error: 'An unexpected error occurred while processing your request',
+    });
   }
 };

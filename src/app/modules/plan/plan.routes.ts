@@ -9,10 +9,10 @@ import {
 
 const PlanROutes = Router();
 
-PlanROutes.post('/create', createTaskHandler);
+PlanROutes.post('/create', createTaskHandler); //done
 PlanROutes.patch('/task/important', toggleImportantHandler);
 PlanROutes.patch('/task/completed', toggleIsCompletedHandler);
 PlanROutes.delete('/delete', deleteTaskHandler);
-PlanROutes.get('/tasks/:userID', getTasksHandler);
+PlanROutes.get('/tasks/:userID', getTasksHandler); //done
 
 export default PlanROutes;
