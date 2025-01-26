@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { ISkill } from './skills.interface';
+
 import * as skillService from './skills.service';
+import { User } from '../user/user.model';
 
 export const getAllSkills = async (
   req: Request,
@@ -10,6 +12,12 @@ export const getAllSkills = async (
     const { userID } = req.body;
     if (!userID) {
       res.status(400).json({ message: 'User ID is required' });
+      return;
+    }
+
+    const userExists = await User.findById(userID).exec();
+    if (!userExists || userExists.isDeleted) {
+      res.status(404).json({ message: 'Invalid User ID' });
       return;
     }
 
@@ -39,6 +47,12 @@ export const createSkill = async (
       return;
     }
 
+    const userExists = await User.findById(skillData.userID).exec();
+    if (!userExists || userExists.isDeleted) {
+      res.status(404).json({ message: 'Invalid User ID' });
+      return;
+    }
+
     const newSkill = await skillService.createSkill(skillData);
     res
       .status(201)
@@ -61,6 +75,12 @@ export const updateSkill = async (
 
     if (!userID) {
       res.status(400).json({ message: 'User ID is required' });
+      return;
+    }
+
+    const userExists = await User.findById(userID).exec();
+    if (!userExists || userExists.isDeleted) {
+      res.status(404).json({ message: 'Invalid User ID' });
       return;
     }
 
@@ -93,6 +113,12 @@ export const deleteSkill = async (
 
     if (!userID) {
       res.status(400).json({ message: 'User ID is required' });
+      return;
+    }
+
+    const userExists = await User.findById(userID).exec();
+    if (!userExists || userExists.isDeleted) {
+      res.status(404).json({ message: 'Invalid User ID' });
       return;
     }
 

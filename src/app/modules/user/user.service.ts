@@ -38,3 +38,23 @@ export const toggleUserDeleteStatus = async (
 export const getDeletedUsers = async (): Promise<IUser[]> => {
   return await User.find({ isDeleted: true });
 };
+
+export function getAllSkills(userID: any) {
+  throw new Error('Function not implemented.');
+}
+
+export function createSkill(skillData: ISkill) {
+  throw new Error('Function not implemented.');
+}
+
+export function updateSkill(
+  userID: any,
+  id: string,
+  updateData: Partial<import('../skills/skills.interface').ISkill>,
+) {
+  throw new Error('Function not implemented.');
+}
+
+export function deleteSkill(userID: any, id: string) {
+  throw new Error('Function not implemented.');
+}
