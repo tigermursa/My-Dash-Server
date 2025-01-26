@@ -9,15 +9,15 @@ import {
 const SkillRouter = Router();
 
 // Route to get all skills for a user
-SkillRouter.get('/skills', getAllSkills);
+SkillRouter.get('/get-skills', getAllSkills);
 
 // Route to create a new skill
-SkillRouter.post('/skills', createSkill);
+SkillRouter.post('/create', createSkill);
 
 // Route to update a specific skill
-SkillRouter.put('/skills/:id', updateSkill);
+SkillRouter.put('/update/:id', updateSkill);
 
 // Route to delete a specific skill
-SkillRouter.delete('/skills/:id', deleteSkill);
+SkillRouter.delete('/delete/:id', deleteSkill);
 
 export default SkillRouter;
