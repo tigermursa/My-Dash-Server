@@ -3,6 +3,11 @@ import { ISkill } from './skills.interface';
 
 import * as skillService from './skills.service';
 import { User } from '../user/user.model';
+import mongoose from 'mongoose';
+
+// Utility function to check if an ID is a valid ObjectId
+const isValidObjectId = (id: string): boolean =>
+  mongoose.Types.ObjectId.isValid(id);
 
 export const getAllSkills = async (
   req: Request,
@@ -44,6 +49,12 @@ export const createSkill = async (
       !skillData.level
     ) {
       res.status(400).json({ message: 'All fields are required' });
+      return;
+    }
+
+    // Validate the userID format
+    if (!isValidObjectId(skillData.userID)) {
+      res.status(400).json({ message: 'Invalid User ID format' });
       return;
     }
 
