@@ -14,7 +14,7 @@ export const getAllSkills = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { userID } = req.body;
+    const { userID } = req.params;
     if (!userID) {
       res.status(400).json({ message: 'User ID is required' });
       return;

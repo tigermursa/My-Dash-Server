@@ -9,15 +9,15 @@ import {
 const SkillRouter = Router();
 
 // Route to get all skills for a user
-SkillRouter.get('/get-skills', getAllSkills); //! not ok have to improve the response
+SkillRouter.get('/get-skills/:userID', getAllSkills);
 
 // Route to create a new skill
-SkillRouter.post('/create', createSkill); //! not ok have to improve the response
+SkillRouter.post('/create', createSkill);
 
 // Route to update a specific skill
-SkillRouter.put('/update/:id', updateSkill); //! not ok have to improve the response
+SkillRouter.put('/update/:id', updateSkill);
 
 // Route to delete a specific skill
-SkillRouter.delete('/delete/:id', deleteSkill); //! not ok have to improve the response
+SkillRouter.delete('/delete/:id', deleteSkill);
 
 export default SkillRouter;
