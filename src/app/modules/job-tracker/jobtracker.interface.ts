@@ -1,19 +1,22 @@
-type ApplicationSource =
+import { Document } from 'mongoose';
+
+export type ApplicationSource =
   | 'LinkedIn'
   | 'Company Website'
   | 'Indeed'
   | 'Referral'
   | 'Other';
-type EmploymentType = 'remote' | 'onsite' | 'hybrid';
-type InterestLevel = 1 | 2 | 3 | 4 | 5;
-type ApplicationStatus =
+export type EmploymentType = 'remote' | 'onsite' | 'hybrid';
+export type InterestLevel = 1 | 2 | 3 | 4 | 5;
+export type ApplicationStatus =
   | 'pending'
   | 'interview'
   | 'rejected'
   | 'no_response'
   | 'offer';
 
-export interface JobApplication {
+// Extend the Mongoose Document interface with your JobApplication interface
+export interface IJobApplication extends Document {
   id: string;
   company: string;
   position: string;

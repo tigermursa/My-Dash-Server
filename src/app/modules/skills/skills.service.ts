@@ -1,20 +1,20 @@
 import { ISkill } from './skills.interface';
 import Skill from './skills.model';
 
-export const getAllSkills = async (userID: string): Promise<ISkill[]> => {
-  try {
-    return await Skill.find({ userID }).exec();
-  } catch (error) {
-    throw new Error('Failed to fetch skills');
-  }
-};
-
 export const createSkill = async (skillData: ISkill): Promise<ISkill> => {
   try {
     const newSkill = new Skill(skillData);
     return await newSkill.save();
   } catch (error) {
     throw new Error('Failed to create skill');
+  }
+};
+
+export const getAllSkills = async (userID: string): Promise<ISkill[]> => {
+  try {
+    return await Skill.find({ userID }).exec();
+  } catch (error) {
+    throw new Error('Failed to fetch skills');
   }
 };
 
