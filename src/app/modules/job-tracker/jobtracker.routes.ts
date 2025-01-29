@@ -16,7 +16,7 @@ JobApplicationRouter.get(
 );
 
 // Route to create a new job application
-JobApplicationRouter.post('/create', createJobApplication);
+JobApplicationRouter.post('/create', createJobApplication); //!need update
 
 // Route to update a specific job application
 JobApplicationRouter.put('/update/:id', updateJobApplication);
