@@ -1,6 +1,7 @@
-import { Types } from 'mongoose'; // Import Types from mongoose
+import { Types } from 'mongoose';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import { ISkill } from '../skills/skills.interface';
 
 export const getUserByID = async (
   id: Types.ObjectId,
