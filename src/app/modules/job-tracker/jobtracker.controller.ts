@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import * as jobApplicationService from './jobtracker.service';
-import { User } from '../user/user.model';
+
 import mongoose from 'mongoose';
+import { User } from '../user/user.model';
 
 // Utility function to check if an ID is a valid ObjectId
 const isValidObjectId = (id: string): boolean =>
@@ -45,8 +46,8 @@ export const createJobApplication = async (
   try {
     const jobData = req.body;
     if (
-      !jobData.userId ||
-      !jobData.companyName ||
+      !jobData.id ||
+      !jobData.company ||
       !jobData.position ||
       !jobData.status
     ) {
@@ -54,12 +55,12 @@ export const createJobApplication = async (
       return;
     }
 
-    if (!isValidObjectId(jobData.userId)) {
+    if (!isValidObjectId(jobData.id)) {
       res.status(400).json({ message: 'Invalid User ID format' });
       return;
     }
 
-    const userExists = await User.findById(jobData.userId).exec();
+    const userExists = await User.findById(jobData.id).exec();
     if (!userExists || userExists.isDeleted) {
       res.status(404).json({ message: 'Invalid User ID' });
       return;

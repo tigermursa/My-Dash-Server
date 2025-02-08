@@ -58,7 +58,7 @@ const JobApplicationSchema: Schema = new Schema(
       required: true,
     },
   },
-  { timestamps: true }, // Adds createdAt and updatedAt timestamps
+  { timestamps: true },
 );
 
 // Export the Mongoose model with the TypeScript interface

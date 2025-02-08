@@ -11,6 +11,7 @@ import UserRoutes from './app/modules/user/user.routes';
 import NotepadRoutes from './app/modules/notepad/notepad.route';
 import PlanR0utes from './app/modules/plan/plan.routes';
 import SkillRouter from './app/modules/skills/skill.routes';
+import JobApplicationRouter from './app/modules/job-tracker/jobtracker.routes';
 
 const app: Application = express();
 
@@ -37,6 +38,7 @@ app.use('/api/v2/user', UserRoutes);
 app.use('/api/v3/plan', PlanR0utes);
 app.use('/api/v4/notepad', NotepadRoutes);
 app.use('/api/v5/skills', SkillRouter);
+app.use('/api/v6/jobs', JobApplicationRouter);
 
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
