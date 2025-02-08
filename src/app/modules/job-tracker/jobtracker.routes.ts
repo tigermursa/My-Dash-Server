@@ -10,11 +10,11 @@ import {
 const JobApplicationRouter = Router();
 
 JobApplicationRouter.get(
-  '/get-job-applications/:userID',
+  '/get-job-applications/:userID', //! working on it
   getAllJobApplications,
 );
 
-JobApplicationRouter.post('/create', createJobApplication); //!need update
+JobApplicationRouter.post('/create', createJobApplication); //! done
 
 JobApplicationRouter.put('/update/:id', updateJobApplication);
 

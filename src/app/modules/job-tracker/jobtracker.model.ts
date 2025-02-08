@@ -4,12 +4,12 @@ import { IJobApplication } from './jobtracker.interface';
 // Create the Mongoose Schema
 const JobApplicationSchema: Schema = new Schema(
   {
-    id: {
+    userId: {
       type: String,
       required: true,
       unique: true,
     },
-    company: {
+    companyName: {
       type: String,
       required: true,
     },

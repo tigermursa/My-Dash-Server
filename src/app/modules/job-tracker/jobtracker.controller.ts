@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import * as jobApplicationService from './jobtracker.service';
-
-import mongoose from 'mongoose';
 import { User } from '../user/user.model';
+import mongoose from 'mongoose';
 
 // Utility function to check if an ID is a valid ObjectId
 const isValidObjectId = (id: string): boolean =>
@@ -14,6 +13,9 @@ export const getAllJobApplications = async (
 ): Promise<void> => {
   try {
     const { userID } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10; //!limit
+
     if (!userID) {
       res.status(400).json({ message: 'User ID is required' });
       return;
@@ -25,10 +27,14 @@ export const getAllJobApplications = async (
       return;
     }
 
-    const jobApplications =
-      await jobApplicationService.getAllJobApplications(userID);
+    const { total, jobApplications } =
+      await jobApplicationService.getAllJobApplications(userID, page, limit);
+
     res.status(200).json({
       message: 'Job applications fetched successfully',
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
       jobApplications,
     });
   } catch (error) {
@@ -46,8 +52,8 @@ export const createJobApplication = async (
   try {
     const jobData = req.body;
     if (
-      !jobData.id ||
-      !jobData.company ||
+      !jobData.userId ||
+      !jobData.companyName ||
       !jobData.position ||
       !jobData.status
     ) {
@@ -55,12 +61,12 @@ export const createJobApplication = async (
       return;
     }
 
-    if (!isValidObjectId(jobData.id)) {
+    if (!isValidObjectId(jobData.userId)) {
       res.status(400).json({ message: 'Invalid User ID format' });
       return;
     }
 
-    const userExists = await User.findById(jobData.id).exec();
+    const userExists = await User.findById(jobData.userId).exec();
     if (!userExists || userExists.isDeleted) {
       res.status(404).json({ message: 'Invalid User ID' });
       return;

@@ -13,12 +13,20 @@ export const createJobApplication = async (
   }
 };
 
-// Get all job applications for a user
+// Get paginated job applications for a user
 export const getAllJobApplications = async (
   userId: string,
-): Promise<IJobApplication[]> => {
+  page: number,
+  limit: number,
+): Promise<{ total: number; jobApplications: IJobApplication[] }> => {
   try {
-    return await JobApplication.find({ userId }).exec();
+    const total = await JobApplication.countDocuments({ userId }).exec();
+    const jobApplications = await JobApplication.find({ userId })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+
+    return { total, jobApplications };
   } catch (error) {
     throw new Error('Failed to fetch job applications');
   }
