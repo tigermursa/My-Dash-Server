@@ -16,6 +16,7 @@ JobApplicationRouter.get(
 
 JobApplicationRouter.post('/create', createJobApplication); //! done
 
+//takes job id as params and userid as body to update
 JobApplicationRouter.put('/update/:id', updateJobApplication);
 
 JobApplicationRouter.delete('/delete/:id', deleteJobApplication);

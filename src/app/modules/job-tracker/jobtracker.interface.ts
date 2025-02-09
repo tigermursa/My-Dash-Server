@@ -17,7 +17,7 @@ export type ApplicationStatus =
 
 // Extend the Mongoose Document interface with your JobApplication interface
 export interface IJobApplication extends Document {
-  id: string;
+  userId: string;
   company: string;
   position: string;
   skills: string[];

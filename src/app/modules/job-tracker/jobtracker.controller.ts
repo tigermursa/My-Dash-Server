@@ -91,29 +91,47 @@ export const updateJobApplication = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { userID } = req.body;
-    const { id } = req.params;
+    // Extract parameters
+    const { id: jobId } = req.params; // Job application ID from URL
+    const { userId, ...updateData } = req.body; // User ID and update data from body
 
-    if (!userID) {
+    // Validate required fields
+    if (!userId) {
       res.status(400).json({ message: 'User ID is required' });
       return;
     }
 
-    const userExists = await User.findById(userID).exec();
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).json({ message: 'Invalid User ID format' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      res.status(400).json({ message: 'Invalid Job Application ID format' });
+      return;
+    }
+
+    // Check if the user exists
+    const userExists = await User.findById(userId).exec();
     if (!userExists || userExists.isDeleted) {
       res.status(404).json({ message: 'Invalid User ID' });
       return;
     }
 
-    const updateData = req.body;
+    // Call the service layer to update the job application
     const updatedJobApplication =
-      await jobApplicationService.updateJobApplication(userID, id, updateData);
+      await jobApplicationService.updateJobApplication(
+        userId,
+        jobId,
+        updateData,
+      );
 
     if (!updatedJobApplication) {
       res.status(404).json({ message: 'Job application not found' });
       return;
     }
 
+    // Respond with success
     res.status(200).json({
       message: 'Job application updated successfully',
       jobApplication: updatedJobApplication,

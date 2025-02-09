@@ -1,5 +1,6 @@
 import JobApplication from './jobtracker.model';
 import { IJobApplication } from './jobtracker.interface';
+import mongoose from 'mongoose';
 
 // Create a new job application
 export const createJobApplication = async (
@@ -32,20 +33,33 @@ export const getAllJobApplications = async (
   }
 };
 
-// Update a job application
 export const updateJobApplication = async (
   userId: string,
   jobId: string,
   updateData: Partial<IJobApplication>,
 ): Promise<IJobApplication | null> => {
   try {
-    return await JobApplication.findOneAndUpdate(
-      { _id: jobId, userId },
+    // Validate the jobId format
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      throw new Error('Invalid Job Application ID format');
+    }
+
+    // Find and update the job application with matching userId and jobId
+    const updatedJobApplication = await JobApplication.findOneAndUpdate(
+      { _id: jobId, userId }, // Ensure the job belongs to the user
       updateData,
-      { new: true },
+      { new: true }, // Return the updated document
     ).exec();
+
+    if (!updatedJobApplication) {
+      throw new Error(
+        'Job application not found or does not belong to the user',
+      );
+    }
+
+    return updatedJobApplication;
   } catch (error) {
-    throw new Error('Failed to update job application');
+    throw new Error(`Failed to update job application: ${error}`);
   }
 };
 
