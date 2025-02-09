@@ -53,7 +53,7 @@ export const createJobApplication = async (
     const jobData = req.body;
     if (
       !jobData.userId ||
-      !jobData.companyName ||
+      !jobData.company ||
       !jobData.position ||
       !jobData.status
     ) {
