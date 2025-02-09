@@ -24,7 +24,7 @@ JobApplicationRouter.delete('/delete/:id', deleteJobApplication); //! done worki
 // Route to get a specific job application by ID
 JobApplicationRouter.get(
   '/get-job-application/:userID/:id',
-  getJobApplicationById,
+  getJobApplicationById, //! done working
 );
 
 export default JobApplicationRouter;
