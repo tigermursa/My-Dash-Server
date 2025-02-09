@@ -10,16 +10,16 @@ import {
 const JobApplicationRouter = Router();
 
 JobApplicationRouter.get(
-  '/get-job-applications/:userID', //! working on it
+  '/get-job-applications/:userID', //! working
   getAllJobApplications,
 );
 
 JobApplicationRouter.post('/create', createJobApplication); //! done
 
 //takes job id as params and userid as body to update
-JobApplicationRouter.put('/update/:id', updateJobApplication);
+JobApplicationRouter.put('/update/:id', updateJobApplication); //!done working
 
-JobApplicationRouter.delete('/delete/:id', deleteJobApplication);
+JobApplicationRouter.delete('/delete/:id', deleteJobApplication); //! done working
 
 // Route to get a specific job application by ID
 JobApplicationRouter.get(
