@@ -20,7 +20,7 @@ export interface IJobApplication extends Document {
   userId: string;
   company: string;
   position: string;
-  skills: string[];
+  skills: string;
   location: string;
   type: EmploymentType;
   status: ApplicationStatus;

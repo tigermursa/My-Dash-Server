@@ -17,7 +17,7 @@ const JobApplicationSchema: Schema = new Schema(
       required: true,
     },
     skills: {
-      type: [String], // Array of strings
+      type: String,
       required: true,
     },
     location: {
