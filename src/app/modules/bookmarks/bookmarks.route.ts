@@ -8,7 +8,7 @@ import {
 
 const BookmarkRouter = Router();
 
-BookmarkRouter.get('/get-bookmarks/:userId', getAllBookmarks);
+BookmarkRouter.get('/get/:userId', getAllBookmarks);
 BookmarkRouter.post('/create', createBookmark);
 BookmarkRouter.put('/update/:id', updateBookmark);
 BookmarkRouter.delete('/delete/:id', deleteBookmark);
