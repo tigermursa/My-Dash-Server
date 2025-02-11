@@ -35,7 +35,7 @@ app.use(cookieParser()); // Cookie parser should be before route handling, but a
 // Parsers
 app.use(express.json());
 
-// Routes BookmarkRouter DateEventRouter ExperienceRouter ProjectRouter
+// Routes
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);

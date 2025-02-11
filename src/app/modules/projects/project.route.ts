@@ -8,7 +8,7 @@ import {
 
 const ProjectRouter = Router();
 
-ProjectRouter.get('/get-projects/:userId', getAllProjects);
+ProjectRouter.get('/get/:userId', getAllProjects);
 ProjectRouter.post('/create', createProject);
 ProjectRouter.put('/update/:id', updateProject);
 ProjectRouter.delete('/delete/:id', deleteProject);
