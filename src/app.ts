@@ -12,6 +12,7 @@ import NotepadRoutes from './app/modules/notepad/notepad.route';
 import PlanR0utes from './app/modules/plan/plan.routes';
 import SkillRouter from './app/modules/skills/skill.routes';
 import JobApplicationRouter from './app/modules/job-tracker/jobtracker.routes';
+import BookmarkRouter from './app/modules/bookmarks/bookmarks.route';
 
 const app: Application = express();
 
@@ -31,7 +32,7 @@ app.use(cookieParser()); // Cookie parser should be before route handling, but a
 // Parsers
 app.use(express.json());
 
-// Routes
+// Routes BookmarkRouter
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
@@ -39,6 +40,7 @@ app.use('/api/v3/plan', PlanR0utes);
 app.use('/api/v4/notepad', NotepadRoutes);
 app.use('/api/v5/skills', SkillRouter);
 app.use('/api/v6/jobs', JobApplicationRouter);
+app.use('/api/v7/bookmarks', BookmarkRouter);
 
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
