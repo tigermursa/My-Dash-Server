@@ -8,7 +8,7 @@ import {
 
 const DateEventRouter = Router();
 
-DateEventRouter.get('/get-date-events/:userId', getAllDateEvents);
+DateEventRouter.get('/get/:userId', getAllDateEvents);
 DateEventRouter.post('/create', createDateEvent);
 DateEventRouter.put('/update/:id', updateDateEvent);
 DateEventRouter.delete('/delete/:id', deleteDateEvent);
