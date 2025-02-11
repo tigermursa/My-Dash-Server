@@ -14,6 +14,7 @@ import SkillRouter from './app/modules/skills/skill.routes';
 import JobApplicationRouter from './app/modules/job-tracker/jobtracker.routes';
 import BookmarkRouter from './app/modules/bookmarks/bookmarks.route';
 import DateEventRouter from './app/modules/events/dateEvents.route';
+import ExperienceRouter from './app/modules/experience/experience.routes';
 
 const app: Application = express();
 
@@ -33,7 +34,7 @@ app.use(cookieParser()); // Cookie parser should be before route handling, but a
 // Parsers
 app.use(express.json());
 
-// Routes BookmarkRouter DateEventRouter
+// Routes BookmarkRouter DateEventRouter ExperienceRouter
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
@@ -43,6 +44,7 @@ app.use('/api/v5/skills', SkillRouter);
 app.use('/api/v6/jobs', JobApplicationRouter);
 app.use('/api/v7/bookmarks', BookmarkRouter);
 app.use('/api/v8/events', DateEventRouter);
+app.use('/api/v9/experience', ExperienceRouter);
 
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
