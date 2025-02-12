@@ -7,7 +7,7 @@ const ExperienceSchema: Schema = new Schema(
     companyName: { type: String, required: true },
     position: { type: String, required: true },
     startDate: { type: String, required: true },
-    endDate: { type: String, required: true },
+    endDate: { type: String },
     isCurrent: { type: Boolean, required: true },
   },
   { timestamps: true },

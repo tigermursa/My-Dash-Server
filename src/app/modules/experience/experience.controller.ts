@@ -47,7 +47,6 @@ export const createExperience = async (
       !companyName ||
       !position ||
       !startDate ||
-      !endDate ||
       isCurrent === undefined
     ) {
       res.status(400).json({ message: 'All fields are required' });
