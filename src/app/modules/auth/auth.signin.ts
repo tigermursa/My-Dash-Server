@@ -30,19 +30,20 @@ export const signin: RequestHandler = async (req, res, next) => {
       throw new CustomError('Wrong credentials', 401);
     }
 
-    // Generate JWT token (HARDCODED EXPIRES IN)
-    const token = jwt.sign(
-      { id: validUser._id },
-      'mysecretjwtkey', // HARDCODED SECRET (Replace with ENV in production)
-      { expiresIn: '1d' }, // HARDCODED EXPIRATION (1 Day)
-    );
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is not defined');
+    }
 
-    // **Set JWT in cookies (Fixed for Localhost)**
+    const expiresIn = process.env.JWT_EXPIRES_IN || '30d';
+    // Generate JWT token (HARDCODED EXPIRES IN)
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
+      expiresIn,
+    });
+
     res.cookie('access_token', token, {
-      httpOnly: true, // Prevent JavaScript from accessing the cookie
-      secure: false, // Set to false because you're using HTTP (not HTTPS) in development
-      sameSite: 'lax', // Allow cookies to be sent across different origins (needed for local development with different ports)
-      maxAge: 3600000,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
     });
 
     res.status(200).json({

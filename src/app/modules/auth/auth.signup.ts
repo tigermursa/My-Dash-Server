@@ -59,19 +59,22 @@ export const signup: RequestHandler = async (req, res, next) => {
         tasks: [],
       },
     ]);
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is not defined');
+    }
     // Generate JWT token
-    const token = jwt.sign(
-      { id: newUser._id },
-      'mysecretjwtkey', // HARDCODED SECRET (Replace with ENV in production)
-      { expiresIn: '1d' },
-    );
+    const expiresIn = process.env.JWT_EXPIRES_IN || '30d';
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn,
+    });
 
     // Set JWT in cookies
     res.cookie('access_token', token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 3600000,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 259200000,
     });
 
     res.status(201).json({

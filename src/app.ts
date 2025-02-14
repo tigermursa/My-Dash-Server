@@ -23,8 +23,8 @@ const app: Application = express();
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: 'http://localhost:5173',
-    credentials: true, // Allow credentials (cookies, authentication)
+    origin: ['http://localhost:5173', 'https://my-dash-ten.vercel.app'],
+    credentials: true,
   }),
 );
 
