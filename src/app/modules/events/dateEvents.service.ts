@@ -17,6 +17,45 @@ export const updateDateEvent = async (
   updateData: Partial<IDateEvent>,
 ): Promise<IDateEvent | null> => {
   try {
+    // If a new eventDate is provided, recalculate dayLeft.
+    if (updateData.eventDate) {
+      const eventDateParsed = new Date(updateData.eventDate);
+      if (isNaN(eventDateParsed.getTime())) {
+        throw new Error('Invalid event date format');
+      }
+
+      // Normalize today's date (time set to midnight).
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      // Extract month and day from the parsed event date.
+      const eventMonth = eventDateParsed.getMonth();
+      const eventDay = eventDateParsed.getDate();
+
+      // Create a date for this year's occurrence of the event.
+      let upcomingEventDate = new Date(
+        today.getFullYear(),
+        eventMonth,
+        eventDay,
+      );
+
+      // If this year's event date has already passed, schedule it for next year.
+      if (upcomingEventDate < today) {
+        upcomingEventDate = new Date(
+          today.getFullYear() + 1,
+          eventMonth,
+          eventDay,
+        );
+      }
+
+      // Calculate the difference in days.
+      const diffTime = upcomingEventDate.getTime() - today.getTime();
+      const dayLeft = Math.ceil(diffTime / (1000 * 3600 * 24));
+
+      // Update the dayLeft value.
+      updateData.dayLeft = dayLeft;
+    }
+
     return await DateEvent.findOneAndUpdate(
       { _id: dateEventId, userId },
       updateData,

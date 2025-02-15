@@ -41,25 +41,30 @@ export const updateDateEvent = async (
   try {
     const { userId } = req.body;
     const { id } = req.params;
+
     if (!userId) {
       res.status(400).json({ message: 'User ID is required' });
       return;
     }
+
     const userExists = await User.findById(userId).exec();
     if (!userExists || userExists.isDeleted) {
       res.status(404).json({ message: 'Invalid User ID' });
       return;
     }
+
     const updateData: Partial<IDateEvent> = req.body;
     const updatedDateEvent = await dateEventService.updateDateEvent(
       userId,
       id,
       updateData,
     );
+
     if (!updatedDateEvent) {
       res.status(404).json({ message: 'Date event not found' });
       return;
     }
+
     res.status(200).json({
       message: 'Date event updated successfully',
       dateEvent: updatedDateEvent,
