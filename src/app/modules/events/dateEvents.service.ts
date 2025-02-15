@@ -45,14 +45,34 @@ export const createDateEvent = async (
   dateEventData: Partial<IDateEvent>, // using Partial since dayLeft will be computed
 ): Promise<IDateEvent> => {
   try {
-    const eventDateObj = new Date(dateEventData.eventDate || '');
-    if (isNaN(eventDateObj.getTime())) {
+    // Parse the event date ignoring the provided year.
+    const eventDateParsed = new Date(dateEventData.eventDate || '');
+    if (isNaN(eventDateParsed.getTime())) {
       throw new Error('Invalid event date format');
     }
 
+    // Get current date and normalize it (remove time-of-day)
     const now = new Date();
-    // Calculate difference in milliseconds and convert to days.
-    const diffTime = eventDateObj.getTime() - now.getTime();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Extract the month and day from the parsed event date.
+    const eventMonth = eventDateParsed.getMonth();
+    const eventDay = eventDateParsed.getDate();
+
+    // Create a date for this year's occurrence of the event.
+    let upcomingEventDate = new Date(today.getFullYear(), eventMonth, eventDay);
+
+    // If this year's event date has already passed, schedule for next year.
+    if (upcomingEventDate < today) {
+      upcomingEventDate = new Date(
+        today.getFullYear() + 1,
+        eventMonth,
+        eventDay,
+      );
+    }
+
+    // Calculate the difference in days.
+    const diffTime = upcomingEventDate.getTime() - today.getTime();
     const dayLeft = Math.ceil(diffTime / (1000 * 3600 * 24));
 
     // Attach computed dayLeft to the data before saving.

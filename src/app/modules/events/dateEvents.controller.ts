@@ -34,48 +34,6 @@ export const getAllDateEvents = async (
   }
 };
 
-export const createDateEvent = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const dateEventData = req.body;
-    const { userId, eventName, eventDate } = dateEventData;
-
-    // Validate required fields.
-    if (!userId || !eventName || !eventDate) {
-      res.status(400).json({ message: 'All fields are required' });
-      return;
-    }
-
-    // Validate user ID format.
-    if (!isValidObjectId(userId)) {
-      res.status(400).json({ message: 'Invalid User ID format' });
-      return;
-    }
-
-    // Check if user exists and is not deleted.
-    const userExists = await User.findById(userId).exec();
-    if (!userExists || userExists.isDeleted) {
-      res.status(404).json({ message: 'Invalid User ID' });
-      return;
-    }
-
-    // Create the date event (dayLeft will be computed in the service layer)
-    const newDateEvent = await dateEventService.createDateEvent(dateEventData);
-
-    res.status(201).json({
-      message: 'Date event created successfully',
-      dateEvent: newDateEvent,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message:
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-    });
-  }
-};
-
 export const updateDateEvent = async (
   req: Request,
   res: Response,
@@ -136,6 +94,48 @@ export const deleteDateEvent = async (
       return;
     }
     res.status(200).json({ message: 'Date event deleted successfully' });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+    });
+  }
+};
+
+export const createDateEvent = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const dateEventData = req.body;
+    const { userId, eventName, eventDate } = dateEventData;
+
+    // Validate required fields.
+    if (!userId || !eventName || !eventDate) {
+      res.status(400).json({ message: 'All fields are required' });
+      return;
+    }
+
+    // Validate user ID format.
+    if (!isValidObjectId(userId)) {
+      res.status(400).json({ message: 'Invalid User ID format' });
+      return;
+    }
+
+    // Check if user exists and is not deleted.
+    const userExists = await User.findById(userId).exec();
+    if (!userExists || userExists.isDeleted) {
+      res.status(404).json({ message: 'Invalid User ID' });
+      return;
+    }
+
+    // Create the date event (dayLeft will be computed in the service layer)
+    const newDateEvent = await dateEventService.createDateEvent(dateEventData);
+
+    res.status(201).json({
+      message: 'Date event created successfully',
+      dateEvent: newDateEvent,
+    });
   } catch (error) {
     res.status(500).json({
       message:
