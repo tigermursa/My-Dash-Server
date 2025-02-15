@@ -7,6 +7,13 @@ import ms from 'ms';
 import { validateUser } from './auth.zodValidation';
 import { AuthService } from './auth.services';
 
+import { IUser } from '../user/user.interface';
+import { NavItem } from '../nav-items/nav-item.modal';
+
+import { generateDefaultNavItems } from '../../data/defaultNavItems';
+import NotepadModel from '../notepad/notepad.model';
+import TasksModel from '../plan/plan.model';
+
 export const signup: RequestHandler = async (req, res, next) => {
   try {
     const parsed = validateUser(req.body);
@@ -25,6 +32,26 @@ export const signup: RequestHandler = async (req, res, next) => {
       password: hashedPassword,
       username,
     });
+
+    // Generate default nav items for the user
+    const defaultNavItems = generateDefaultNavItems(newUser._id);
+    await NavItem.insertMany(defaultNavItems);
+
+    // Create default Notepad for user
+    await NotepadModel.create({
+      userId: newUser._id,
+      contentNotePad: 'write your note',
+      contentIdea: 'write your idea',
+    });
+
+    // Create an empty TasksModel document for the new user
+
+    await TasksModel.create([
+      {
+        userID: newUser._id,
+        tasks: [],
+      },
+    ]);
 
     if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
 
