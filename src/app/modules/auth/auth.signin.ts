@@ -1,56 +1,46 @@
 import { RequestHandler } from 'express';
-import { AuthService } from './auth.services';
+
 import { CustomError } from '../../Error/CustomError';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import ms from 'ms';
+import { AuthService } from './auth.services';
 
 export const signin: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    // Check if email and password are provided
-    if (!email || !password) {
+    if (!email || !password)
       throw new CustomError('Email and password are required', 400);
-    }
 
-    // Find user by email
-    const validUser = await AuthService.findUserByEmail(email);
-    if (!validUser) {
-      throw new CustomError('User not found', 404);
-    }
+    const user = await AuthService.findUserByEmail(email);
+    if (!user) throw new CustomError('User not found', 404);
+    if (!user.password) throw new CustomError('User password not found', 500);
 
-    // Ensure the password field exists in the database
-    if (!validUser.password) {
-      throw new CustomError('User password not found in database', 500);
-    }
+    const isPasswordValid = bcryptjs.compareSync(password, user.password);
+    if (!isPasswordValid) throw new CustomError('Wrong credentials', 401);
 
-    // Check if the password matches
-    const validPassword = bcryptjs.compareSync(password, validUser.password);
-    if (!validPassword) {
-      throw new CustomError('Wrong credentials', 401);
-    }
-
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET environment variable is not defined');
-    }
+    if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
 
     const expiresIn = process.env.JWT_EXPIRES_IN || '30d';
-    // Generate JWT token (HARDCODED EXPIRES IN)
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn,
     });
+    const maxAge: number = (ms as unknown as (value: string) => number)(
+      expiresIn,
+    );
 
     res.cookie('access_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge,
     });
 
     res.status(200).json({
       message: 'User logged in successfully!',
-      _id: validUser._id,
-      username: validUser.username,
-      email: validUser.email,
+      _id: user._id,
+      username: user.username,
+      email: user.email,
     });
   } catch (error) {
     next(error);

@@ -1,90 +1,47 @@
 import { RequestHandler } from 'express';
-import jwt from 'jsonwebtoken';
-import bcryptjs from 'bcryptjs';
-import { AuthService } from './auth.services';
-import { validateUser } from './auth.zodValidation';
+
 import { CustomError } from '../../Error/CustomError';
-import { IUser } from '../user/user.interface';
-import { NavItem } from '../nav-items/nav-item.modal';
-import { generateDefaultNavItems } from '../../data/defaultNavItems';
-import NotepadModel from '../notepad/notepad.model';
-import TasksModel from '../plan/plan.model';
+import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import ms from 'ms';
+import { AuthService } from './auth.services';
 
-export const signup: RequestHandler = async (req, res, next) => {
-  const { username, email, password } = req.body;
-
+export const signin: RequestHandler = async (req, res, next) => {
   try {
-    // Validate input using Zod
-    const validationResult = validateUser(req.body);
-    if (!validationResult.success) {
-      res.status(400).json({ errors: validationResult.error.errors });
-      return;
-    }
+    const { email, password } = req.body;
+    if (!email || !password)
+      throw new CustomError('Email and password are required', 400);
 
-    // Check if user already exists
-    const existingUser = await AuthService.findUserByEmail(email);
-    if (existingUser) {
-      throw new CustomError('User already exists', 400);
-    }
+    const user = await AuthService.findUserByEmail(email);
+    if (!user) throw new CustomError('User not found', 404);
+    if (!user.password) throw new CustomError('User password not found', 500);
 
-    // Hash the password
-    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const isPasswordValid = bcryptjs.compareSync(password, user.password);
+    if (!isPasswordValid) throw new CustomError('Wrong credentials', 401);
 
-    // Create user data
-    const userData: Partial<IUser> = {
-      username,
-      email,
-      password: hashedPassword,
-    };
+    if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
 
-    // Save the user
-    const newUser = await AuthService.createUser(userData);
-
-    // Generate default nav items for the user
-    const defaultNavItems = generateDefaultNavItems(newUser._id);
-    await NavItem.insertMany(defaultNavItems);
-
-    // Create default Notepad for user
-    await NotepadModel.create({
-      userId: newUser._id,
-      contentNotePad: 'write your note',
-      contentIdea: 'write your idea',
-    });
-
-    // Create an empty TasksModel document for the new user
-
-    await TasksModel.create([
-      {
-        userID: newUser._id,
-        tasks: [],
-      },
-    ]);
-
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET environment variable is not defined');
-    }
-    // Generate JWT token
     const expiresIn = process.env.JWT_EXPIRES_IN || '30d';
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn,
     });
+    const maxAge: number = (ms as unknown as (value: string) => number)(
+      expiresIn,
+    );
 
-    // Set JWT in cookies
     res.cookie('access_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 259200000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge,
     });
 
-    res.status(201).json({
-      message: 'User registered successfully!',
-      _id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
+    res.status(200).json({
+      message: 'User logged in successfully!',
+      _id: user._id,
+      username: user.username,
+      email: user.email,
     });
-
-    return;
   } catch (error) {
     next(error);
   }
