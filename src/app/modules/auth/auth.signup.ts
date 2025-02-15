@@ -13,6 +13,10 @@ import { NavItem } from '../nav-items/nav-item.modal';
 import { generateDefaultNavItems } from '../../data/defaultNavItems';
 import NotepadModel from '../notepad/notepad.model';
 import TasksModel from '../plan/plan.model';
+import {
+  defaultContentIdea,
+  defaultContentNotePad,
+} from '../../data/defaultNotepadData';
 
 export const signup: RequestHandler = async (req, res, next) => {
   try {
@@ -37,13 +41,12 @@ export const signup: RequestHandler = async (req, res, next) => {
     const defaultNavItems = generateDefaultNavItems(newUser._id);
     await NavItem.insertMany(defaultNavItems);
 
-    // Create default Notepad for user
+    // Create default Notepad for user using the imported HTML content
     await NotepadModel.create({
       userId: newUser._id,
-      contentNotePad: 'write your note',
-      contentIdea: 'write your idea',
+      contentNotePad: defaultContentNotePad,
+      contentIdea: defaultContentIdea,
     });
-
     // Create an empty TasksModel document for the new user
 
     await TasksModel.create([
