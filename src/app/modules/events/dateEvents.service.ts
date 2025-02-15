@@ -1,17 +1,6 @@
 import { IDateEvent } from './dateEvents.interface';
 import DateEvent from './dateEvents.model';
 
-export const createDateEvent = async (
-  dateEventData: IDateEvent,
-): Promise<IDateEvent> => {
-  try {
-    const newDateEvent = new DateEvent(dateEventData);
-    return await newDateEvent.save();
-  } catch (error) {
-    throw new Error('Failed to create date event');
-  }
-};
-
 export const getAllDateEvents = async (
   userId: string,
 ): Promise<IDateEvent[]> => {
@@ -49,5 +38,29 @@ export const deleteDateEvent = async (
     }).exec();
   } catch (error) {
     throw new Error('Failed to delete date event');
+  }
+};
+
+export const createDateEvent = async (
+  dateEventData: Partial<IDateEvent>, // using Partial since dayLeft will be computed
+): Promise<IDateEvent> => {
+  try {
+    const eventDateObj = new Date(dateEventData.eventDate || '');
+    if (isNaN(eventDateObj.getTime())) {
+      throw new Error('Invalid event date format');
+    }
+
+    const now = new Date();
+    // Calculate difference in milliseconds and convert to days.
+    const diffTime = eventDateObj.getTime() - now.getTime();
+    const dayLeft = Math.ceil(diffTime / (1000 * 3600 * 24));
+
+    // Attach computed dayLeft to the data before saving.
+    const dateEventWithDayLeft = { ...dateEventData, dayLeft };
+
+    const newDateEvent = new DateEvent(dateEventWithDayLeft);
+    return await newDateEvent.save();
+  } catch (error) {
+    throw new Error('Failed to create date event');
   }
 };

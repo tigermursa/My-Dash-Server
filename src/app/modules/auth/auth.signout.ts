@@ -18,3 +18,6 @@ export async function signout(
     next(error);
   }
 }
+
+// secure: process.env.NODE_ENV === 'production',
+//       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
