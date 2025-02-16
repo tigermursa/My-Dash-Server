@@ -9,13 +9,14 @@ import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
 
 import NotepadRoutes from './app/modules/notepad/notepad.route';
-import PlanR0utes from './app/modules/plan/plan.routes';
+
 import SkillRouter from './app/modules/skills/skill.routes';
 import JobApplicationRouter from './app/modules/job-tracker/jobtracker.routes';
 import BookmarkRouter from './app/modules/bookmarks/bookmarks.route';
 import DateEventRouter from './app/modules/events/dateEvents.route';
 import ExperienceRouter from './app/modules/experience/experience.routes';
 import ProjectRouter from './app/modules/projects/project.route';
+import PlanRoutes from './app/modules/plan/plan.routes';
 
 const app: Application = express();
 
@@ -37,7 +38,7 @@ app.use(express.json());
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
-app.use('/api/v3/plan', PlanR0utes);
+app.use('/api/v3/plan', PlanRoutes);
 app.use('/api/v4/notepad', NotepadRoutes);
 app.use('/api/v5/skills', SkillRouter);
 app.use('/api/v6/jobs', JobApplicationRouter);

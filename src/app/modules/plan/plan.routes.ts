@@ -5,14 +5,16 @@ import {
   toggleTaskFieldHandler,
   deleteTaskHandler,
   getTasksHandler,
+  updateTaskTextHandler,
 } from './plan.controller';
 
-const PlanR0utes = express.Router();
+const PlanRoutes = express.Router();
 
-PlanR0utes.post('/create', createTaskHandler);
-PlanR0utes.patch('/tasks/important', toggleTaskFieldHandler('important'));
-PlanR0utes.patch('/tasks/completed', toggleTaskFieldHandler('isCompleted'));
-PlanR0utes.delete('/tasks/delete', deleteTaskHandler);
-PlanR0utes.get('/tasks/:userID', getTasksHandler);
+PlanRoutes.post('/create', createTaskHandler);
+PlanRoutes.patch('/tasks/important', toggleTaskFieldHandler('important'));
+PlanRoutes.patch('/tasks/completed', toggleTaskFieldHandler('isCompleted'));
+PlanRoutes.patch('/tasks/text', updateTaskTextHandler);
+PlanRoutes.delete('/tasks/delete', deleteTaskHandler);
+PlanRoutes.get('/tasks/:userID', getTasksHandler);
 
-export default PlanR0utes;
+export default PlanRoutes;

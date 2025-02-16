@@ -4,6 +4,7 @@ import {
   toggleTaskField,
   removeTask,
   getTasks,
+  updateTaskText,
 } from './plan.service';
 import { ServiceResponse } from '../../types/plan';
 import { determineStatusCode } from '../../Error/handleError';
@@ -99,5 +100,25 @@ export const getTasksHandler: RequestHandler = async (req, res) => {
     result.message = result.message || 'Failed to retrieve tasks';
   }
 
+  handleControllerResponse(res, result);
+};
+
+export const updateTaskTextHandler: RequestHandler = async (req, res) => {
+  // Validate required parameters: userID, taskId, and text.
+  const paramError = validateRequestParams(req, ['userID', 'taskId', 'text']);
+  if (paramError) {
+    res.status(400).json({ success: false, error: paramError });
+    return;
+  }
+
+  const newText = req.body.text;
+
+  // Call the service to update the task text.
+  const result = await updateTaskText(
+    req.body.userID,
+    req.body.taskId,
+    newText,
+  );
+  result.message = 'Task text updated successfully';
   handleControllerResponse(res, result);
 };

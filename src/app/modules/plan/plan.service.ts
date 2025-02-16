@@ -100,3 +100,13 @@ export const getTasks = async (
     return handleServiceError(error);
   }
 };
+
+export const updateTaskText = async (
+  userID: string,
+  taskId: string,
+  newText: string,
+): Promise<ServiceResponse<TaskResponse>> => {
+  return modifyTask(userID, taskId, (task) => {
+    task.text = newText;
+  });
+};
