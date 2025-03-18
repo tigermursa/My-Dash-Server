@@ -1,68 +1,24 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-import {
-  IWeeklySchedule,
-  ITimePeriod,
-  ISession,
-  IDaySchedule,
-} from './dutyTime.interface';
+import mongoose, { Schema, Document } from 'mongoose';
+import { IDutySchedule } from './dutyTime.interface';
 
-// Extend the IWeeklySchedule interface with Mongoose Document properties.
-export interface IWeeklyScheduleDocument extends IWeeklySchedule, Document {}
-
-// Sub-schema for a time period.
-const TimePeriodSchema: Schema<ITimePeriod> = new Schema(
+const TimeSlotSchema: Schema = new Schema(
   {
-    start: { type: String, required: true },
-    end: { type: String, required: true },
+    label: { type: String },
+    startTime: { type: String },
+    endTime: { type: String },
   },
   { _id: false },
 );
 
-// Sub-schema for a session.
-const SessionSchema: Schema<ISession> = new Schema(
-  {
-    start: { type: String, required: true },
-    end: { type: String, required: true },
-    type: {
-      type: String,
-      enum: ['morning', 'afternoon', 'night'],
-      required: true,
-    },
-  },
-  { _id: false },
-);
-
-// Sub-schema for a day schedule.
-const DayScheduleSchema: Schema<IDaySchedule> = new Schema(
-  {
-    day: {
-      type: String,
-      enum: [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-      ],
-      required: true,
-    },
-    isOff: { type: Boolean, required: true },
-    sessions: { type: [SessionSchema], default: [] },
-    groupMonitoring: { type: TimePeriodSchema, required: false },
-  },
-  { _id: false },
-);
-
-// Main schema for the weekly schedule.
-const WeeklyScheduleSchema: Schema<IWeeklyScheduleDocument> = new Schema({
-  days: { type: [DayScheduleSchema], required: true },
+const DutyScheduleSchema: Schema = new Schema({
+  date: { type: String, required: true },
+  day: { type: String, required: true },
+  session1: { type: String, enum: ['morning', 'afternoon', 'night'] },
+  session2: { type: String, enum: ['morning', 'afternoon', 'night', 'none'] },
+  groupMonitoring: { type: TimeSlotSchema },
 });
 
-// Mongoose model.
-export const WeeklyScheduleModel: Model<IWeeklyScheduleDocument> =
-  mongoose.model<IWeeklyScheduleDocument>(
-    'WeeklySchedule',
-    WeeklyScheduleSchema,
-  );
+export default mongoose.model<IDutySchedule>(
+  'DutySchedule',
+  DutyScheduleSchema,
+);

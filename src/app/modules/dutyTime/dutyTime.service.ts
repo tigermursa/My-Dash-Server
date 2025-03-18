@@ -1,42 +1,21 @@
-import { WeeklyScheduleModel } from './dutyTime.model';
-import { IWeeklySchedule } from './dutyTime.interface';
+import { IDutySchedule } from './dutyTime.interface';
+import DutySchedule from './dutyTime.model';
 
-export class WeeklyScheduleService {
-  static async createWeeklySchedule(
-    data: IWeeklySchedule,
-  ): Promise<IWeeklySchedule> {
-    return await WeeklyScheduleModel.create(data);
-  }
+export const createDutyScheduleService = async (
+  data: Partial<IDutySchedule>,
+): Promise<IDutySchedule> => {
+  return await DutySchedule.create(data);
+};
 
-  static async getAllWeeklySchedules(): Promise<IWeeklySchedule[]> {
-    return await WeeklyScheduleModel.find();
-  }
+export const getAllDutySchedulesService = async (): Promise<
+  IDutySchedule[]
+> => {
+  return await DutySchedule.find();
+};
 
-  static async getDaySchedule(day: string) {
-    const schedule = await WeeklyScheduleModel.findOne();
-    if (!schedule) throw new Error('Weekly schedule not found.');
-    const daySchedule = schedule.days.find(
-      (d) => d.day.toLowerCase() === day.toLowerCase(),
-    );
-    if (!daySchedule) throw new Error(`Day schedule for ${day} not found.`);
-    return daySchedule;
-  }
-
-  static async updateDaySchedule(
-    day: string,
-    updateData: Partial<IWeeklySchedule['days'][0]>,
-  ) {
-    const schedule = await WeeklyScheduleModel.findOne();
-    if (!schedule) throw new Error('Weekly schedule not found.');
-    const dayIndex = schedule.days.findIndex(
-      (d) => d.day.toLowerCase() === day.toLowerCase(),
-    );
-    if (dayIndex === -1) throw new Error(`Day schedule for ${day} not found.`);
-    schedule.days[dayIndex] = {
-      ...schedule.days[dayIndex].toObject(),
-      ...updateData,
-    };
-    await schedule.save();
-    return schedule.days[dayIndex];
-  }
-}
+export const updateDutyScheduleService = async (
+  id: string,
+  data: Partial<IDutySchedule>,
+): Promise<IDutySchedule | null> => {
+  return await DutySchedule.findByIdAndUpdate(id, data, { new: true });
+};
