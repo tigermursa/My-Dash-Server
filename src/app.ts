@@ -25,7 +25,7 @@ const app: Application = express();
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://my-dash-ten.vercel.app'],
+    origin: ['https://my-dash-ten.vercel.app', 'https://my-duty.vercel.app'],
     credentials: true,
   }),
 );
