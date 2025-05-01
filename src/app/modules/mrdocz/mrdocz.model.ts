@@ -10,7 +10,7 @@ export interface DocumentModel extends MongooseDocument {
 const DocumentSchema = new Schema<DocumentModel>(
   {
     name: { type: String, required: true, trim: true },
-    url: { type: String, required: true },
+    url: { type: String, required: true, unique: true },
     createdAt: { type: Date, default: () => new Date(), immutable: true },
     category: { type: String, default: undefined },
   },
