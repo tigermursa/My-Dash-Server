@@ -18,6 +18,7 @@ import ExperienceRouter from './app/modules/experience/experience.routes';
 import ProjectRouter from './app/modules/projects/project.route';
 import PlanRoutes from './app/modules/plan/plan.routes';
 import DutyTimeRoutes from './app/modules/dutyTime/dutyTime.routes';
+import MrDoczROutes from './app/modules/mrdocz/mrdocz.routes';
 
 const app: Application = express();
 
@@ -52,6 +53,7 @@ app.use('/api/v8/events', DateEventRouter);
 app.use('/api/v9/experience', ExperienceRouter);
 app.use('/api/v10/project', ProjectRouter);
 app.use('/api/v11/office', DutyTimeRoutes);
+app.use('/api/v12/docs', MrDoczROutes);
 
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
