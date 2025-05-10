@@ -31,7 +31,7 @@ app.use(
       'https://my-dash-ten.vercel.app',
       'https://my-duty.vercel.app',
       'https://mrdocz.vercel.app',
-      'http://localhost:3000/',
+      'http://localhost:3000',
     ],
     credentials: true,
   }),

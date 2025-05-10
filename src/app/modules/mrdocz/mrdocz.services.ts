@@ -58,6 +58,7 @@ export class DocumentService {
       id: js.id,
       name: js.name,
       url: js.url,
+      isDeleted: js.isDeleted,
       createdAt: js.createdAt.toISOString(),
       category: js.category,
     };

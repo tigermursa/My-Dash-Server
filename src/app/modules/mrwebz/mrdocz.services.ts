@@ -14,6 +14,7 @@ export class WebsiteService {
       url: js.url,
       createdAt: js.createdAt.toISOString(),
       category: js.category,
+      isDeleted: js.isDeleted,
     };
   }
 
@@ -27,6 +28,7 @@ export class WebsiteService {
         url: js.url,
         createdAt: js.createdAt.toISOString(),
         category: js.category,
+        isDeleted: js.isDeleted,
       };
     });
   }
@@ -41,6 +43,7 @@ export class WebsiteService {
       url: js.url,
       createdAt: js.createdAt.toISOString(),
       category: js.category,
+      isDeleted: js.isDeleted,
     };
   }
 
@@ -60,6 +63,7 @@ export class WebsiteService {
       url: js.url,
       createdAt: js.createdAt.toISOString(),
       category: js.category,
+      isDeleted: js.isDeleted,
     };
   }
 

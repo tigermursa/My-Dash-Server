@@ -5,7 +5,7 @@ export interface WebsiteModel extends MongooseDocument {
   url: string;
   createdAt: Date;
   category?: string;
-  isDeleted: { type: Boolean; default: false };
+  isDeleted: boolean;
 }
 
 const WebsiteSchema = new Schema<WebsiteModel>(
