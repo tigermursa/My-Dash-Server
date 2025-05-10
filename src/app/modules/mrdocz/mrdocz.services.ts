@@ -67,4 +67,13 @@ export class DocumentService {
     const res = await DocumentMongoose.findByIdAndDelete(id);
     return res != null;
   }
+
+  static async markAsDeleted(id: string): Promise<boolean> {
+    const updated = await DocumentMongoose.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
+    return updated != null;
+  }
 }

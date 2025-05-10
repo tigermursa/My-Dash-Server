@@ -4,4 +4,5 @@ export interface DocumentDTO {
   url: string;
   createdAt: string;
   category?: string;
+  isDeleted?: boolean;
 }

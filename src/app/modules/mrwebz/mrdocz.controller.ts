@@ -58,3 +58,20 @@ export const deleteWebsiteHandler: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const softDeleteWebsiteHandler: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const success = await WebsiteService.markAsDeleted(req.params.id);
+    if (!success) {
+      res.status(404).json({ success: false, message: 'Website not found' });
+      return;
+    }
+    res.json({ success: true, message: 'Website marked as deleted' });
+  } catch (err) {
+    next(err);
+  }
+};

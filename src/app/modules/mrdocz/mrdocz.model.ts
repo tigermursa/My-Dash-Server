@@ -5,6 +5,7 @@ export interface DocumentModel extends MongooseDocument {
   url: string;
   createdAt: Date;
   category?: string;
+  isDeleted?: boolean;
 }
 
 const DocumentSchema = new Schema<DocumentModel>(
@@ -13,6 +14,7 @@ const DocumentSchema = new Schema<DocumentModel>(
     url: { type: String, required: true, unique: true },
     createdAt: { type: Date, default: () => new Date(), immutable: true },
     category: { type: String, default: undefined },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     toJSON: {

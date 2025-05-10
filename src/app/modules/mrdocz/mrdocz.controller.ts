@@ -68,3 +68,20 @@ export const deleteDocumentHandler: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const softDeleteDocumentHandler: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const success = await DocumentService.markAsDeleted(req.params.id);
+    if (!success) {
+      res.status(404).json({ success: false, message: 'Document not found' });
+      return;
+    }
+    res.json({ success: true, message: 'Document marked as deleted' });
+  } catch (err) {
+    next(err);
+  }
+};

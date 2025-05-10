@@ -67,4 +67,13 @@ export class WebsiteService {
     const res = await WebsiteMongoose.findByIdAndDelete(id);
     return res != null;
   }
+
+  static async markAsDeleted(id: string): Promise<boolean> {
+    const updated = await WebsiteMongoose.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
+    return updated != null;
+  }
 }

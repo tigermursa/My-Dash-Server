@@ -5,6 +5,7 @@ export interface WebsiteModel extends MongooseDocument {
   url: string;
   createdAt: Date;
   category?: string;
+  isDeleted: { type: Boolean; default: false };
 }
 
 const WebsiteSchema = new Schema<WebsiteModel>(
@@ -13,6 +14,7 @@ const WebsiteSchema = new Schema<WebsiteModel>(
     url: { type: String, required: true, unique: true },
     createdAt: { type: Date, default: () => new Date(), immutable: true },
     category: { type: String, default: undefined },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     toJSON: {
