@@ -19,6 +19,7 @@ import ProjectRouter from './app/modules/projects/project.route';
 import PlanRoutes from './app/modules/plan/plan.routes';
 import DutyTimeRoutes from './app/modules/dutyTime/dutyTime.routes';
 import MrDoczROutes from './app/modules/mrdocz/mrdocz.routes';
+import MrWebzRoutes from './app/modules/mrwebz/mrdocz.routes';
 
 const app: Application = express();
 
@@ -29,7 +30,8 @@ app.use(
     origin: [
       'https://my-dash-ten.vercel.app',
       'https://my-duty.vercel.app',
-      'http://localhost:5173',
+      'https://mrdocz.vercel.app',
+      'http://localhost:3000/',
     ],
     credentials: true,
   }),
@@ -54,7 +56,7 @@ app.use('/api/v9/experience', ExperienceRouter);
 app.use('/api/v10/project', ProjectRouter);
 app.use('/api/v11/office', DutyTimeRoutes);
 app.use('/api/v12/docs', MrDoczROutes);
-
+app.use('/api/v13/webs', MrWebzRoutes);
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
   const filePath = path.join(process.cwd(), 'views', 'status.html');
