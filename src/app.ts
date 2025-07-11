@@ -3,13 +3,14 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import navItemRoutes from './app/modules/nav-items/nav-item.route';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import UserRoutes from './app/modules/user/user.routes';
-
 import NotepadRoutes from './app/modules/notepad/notepad.route';
-
 import SkillRouter from './app/modules/skills/skill.routes';
 import JobApplicationRouter from './app/modules/job-tracker/jobtracker.routes';
 import BookmarkRouter from './app/modules/bookmarks/bookmarks.route';
@@ -20,6 +21,7 @@ import PlanRoutes from './app/modules/plan/plan.routes';
 import DutyTimeRoutes from './app/modules/dutyTime/dutyTime.routes';
 import MrDoczROutes from './app/modules/mrdocz/mrdocz.routes';
 import MrWebzRoutes from './app/modules/mrwebz/mrdocz.routes';
+import MyPurchases from './app/modules/mypurchases/mypurchases.routes';
 
 const app: Application = express();
 
@@ -38,12 +40,10 @@ app.use(
   }),
 );
 
-app.use(cookieParser()); // Cookie parser should be before route handling, but after CORS setup.
-
-// Parsers
+app.use(cookieParser());
 app.use(express.json());
 
-// Routes
+// Existing routes
 app.use('/api/v1/nav-items', navItemRoutes);
 app.use('/api/v2/user', AuthRoutes);
 app.use('/api/v2/user', UserRoutes);
@@ -58,13 +58,15 @@ app.use('/api/v10/project', ProjectRouter);
 app.use('/api/v11/office', DutyTimeRoutes);
 app.use('/api/v12/docs', MrDoczROutes);
 app.use('/api/v13/webs', MrWebzRoutes);
+app.use('/api/v14/taka', MyPurchases);
+
 // Root route for serving status page
 app.get('/', (_req: Request, res: Response) => {
   const filePath = path.join(process.cwd(), 'views', 'status.html');
   res.sendFile(filePath);
 });
 
-// Global error handling middleware should be placed at the end of the middleware stack
+// Global error handling middleware
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   res.status(err.status || 500).json({
@@ -72,7 +74,5 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     message: err.message || 'Internal Server Error',
   });
 });
-
-// app.use(errorHandler);
 
 export default app;

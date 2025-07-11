@@ -1,102 +1,101 @@
 import { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
 import { MyPurchasesService } from './mypurchases.services';
+import { IProduct } from './mypurchases.interface';
 
-export const createPurchaseHandler = async (
+// Handler to create a new purchase
+const createPurchaseHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
-  }
   try {
-    const { name, url, purchaseDate, warranty, guarantee, price } = req.body;
-    const created = await MyPurchasesService.create({
-      name,
-      url,
-      purchaseDate,
-      warranty,
-      guarantee,
-      price,
-    });
-    res.status(201).json({ success: true, data: created });
-  } catch (err) {
-    next(err);
+    const payload: Omit<IProduct, 'id' | 'usingDays'> = req.body;
+    const created = await MyPurchasesService.create(payload);
+    return res.status(201).json({ success: true, data: created });
+  } catch (error) {
+    return next(error);
   }
 };
 
-export const getAllPurchasesHandler = async (
+// Handler to get all purchases
+const getAllPurchasesHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const products = await MyPurchasesService.getAll();
-    res.json({ success: true, data: products });
-  } catch (err) {
-    next(err);
+    return res.json({ success: true, data: products });
+  } catch (error) {
+    return next(error);
   }
 };
 
-export const getPurchaseByIdHandler = async (
+// Handler to get a purchase by ID
+const getPurchaseByIdHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const product = await MyPurchasesService.getById(req.params.id);
+    const productId = req.params.id;
+    const product = await MyPurchasesService.getById(productId);
     if (!product) {
       return res
         .status(404)
         .json({ success: false, message: 'Product not found' });
     }
-    res.json({ success: true, data: product });
-  } catch (err) {
-    next(err);
+    return res.json({ success: true, data: product });
+  } catch (error) {
+    return next(error);
   }
 };
 
-export const updatePurchaseHandler = async (
+// Handler to update a purchase by ID
+const updatePurchaseHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
-  }
   try {
-    const updated = await MyPurchasesService.updateById(
-      req.params.id,
-      req.body,
-    );
+    const productId = req.params.id;
+    const updateData: Partial<Omit<IProduct, 'id' | 'usingDays'>> = req.body;
+    const updated = await MyPurchasesService.updateById(productId, updateData);
     if (!updated) {
       return res
         .status(404)
         .json({ success: false, message: 'Product not found' });
     }
-    res.json({ success: true, data: updated });
-  } catch (err) {
-    next(err);
+    return res.json({ success: true, data: updated });
+  } catch (error) {
+    return next(error);
   }
 };
 
-export const deletePurchaseHandler = async (
+// Handler to delete a purchase by ID
+const deletePurchaseHandler = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const deleted = await MyPurchasesService.deleteById(req.params.id);
+    const productId = req.params.id;
+    const deleted = await MyPurchasesService.deleteById(productId);
     if (!deleted) {
       return res
         .status(404)
         .json({ success: false, message: 'Product not found' });
     }
-    res.json({ success: true, message: 'Product deleted' });
-  } catch (err) {
-    next(err);
+    return res.json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    return next(error);
   }
+};
+
+export const PurchaseController = {
+  createPurchaseHandler,
+  getAllPurchasesHandler,
+  getPurchaseByIdHandler,
+  updatePurchaseHandler,
+  deletePurchaseHandler,
 };
