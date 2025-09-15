@@ -3,7 +3,6 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
